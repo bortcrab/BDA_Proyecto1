@@ -1,50 +1,61 @@
-create database proyecto1;
-use proyecto1;
+CREATE DATABASE proyecto1;
+USE proyecto1;
 
-create table Clientes(
-idCliente int auto_increment primary key,
-nombres varchar(50) not null,
-apellidoPaterno varchar(50) not null,
-apellidoMaterno varchar(50) not null,
-codigoPostal varchar(5) not null,
-colonia varchar(50) not null,
-calle varchar(50) not null,
-numExterior varchar(5) not null,
-fechaNacimiento date not null
+CREATE TABLE Clientes (
+    idCliente INT AUTO_INCREMENT PRIMARY KEY,
+    nombres VARCHAR(50) NOT NULL,
+    apellidoPaterno VARCHAR(50) NOT NULL,
+    apellidoMaterno VARCHAR(50) NOT NULL,
+    fechaNacimiento DATE NOT NULL
 );
 
-create table Cuentas(
-numCuenta int auto_increment primary key,
-saldo decimal(15, 2) not null,
-fechaApertura date default (curdate()) not null,
-estaEliminado bit default 0 not null,
-idCliente int not null,
-foreign key (idCliente) references Clientes(idCliente)
+CREATE TABLE Direcciones (
+	codigoDireccion INT AUTO_INCREMENT PRIMARY KEY,
+    codigoPostal VARCHAR(5) NOT NULL,
+    colonia VARCHAR(50) NOT NULL,
+    calle VARCHAR(50) NOT NULL,
+    numExterior VARCHAR(5) NOT NULL,
+    idCliente INT,
+    FOREIGN KEY (idCliente)
+    REFERENCES Clientes (idCliente)
 );
 
-create table Operaciones(
-folio int auto_increment primary key,
-monto decimal(15, 2) not null,
-tipo enum('Transferencia', 'Retiro sin cuenta') not null,
-fechaHoraEjec datetime default now() not null,
-numCuenta int not null,
-foreign key (numCuenta) references Cuentas(numCuenta)
+CREATE TABLE Cuentas (
+    numCuenta INT AUTO_INCREMENT PRIMARY KEY,
+    saldo DECIMAL(15 , 2 ) NOT NULL,
+    fechaApertura DATE NOT NULL DEFAULT (CURRENT_DATE()),
+    estaEliminado BIT DEFAULT 0 NOT NULL,
+    idCliente INT NOT NULL,
+    FOREIGN KEY (idCliente)
+    REFERENCES Clientes (idCliente)
 );
 
-create table Transferencias(
-folio int primary key,
-foreign key (folio) references Operaciones(folio)
+CREATE TABLE Operaciones (
+    folio INT AUTO_INCREMENT PRIMARY KEY,
+    monto DECIMAL(15 , 2 ) NOT NULL,
+    tipo ENUM('Transferencia', 'Retiro sin cuenta') NOT NULL,
+    fechaHoraEjec DATETIME DEFAULT NOW() NOT NULL,
+    numCuenta INT NOT NULL,
+    FOREIGN KEY (numCuenta)
+    REFERENCES Cuentas (numCuenta)
 );
 
-create table RetirosSinCuenta(
-folio int primary key,
-contrasenia int not null,
-estado enum('Pendiente', 'Cobrado', 'No cobrado'),
-foreign key (folio) references Operaciones(folio)
+CREATE TABLE Transferencias (
+    folio INT PRIMARY KEY,
+    FOREIGN KEY (folio)
+    REFERENCES Operaciones (folio)
+);
+
+CREATE TABLE RetirosSinCuenta (
+    folio INT PRIMARY KEY,
+    contrasenia INT NOT NULL,
+    estado ENUM('Pendiente', 'Cobrado', 'No cobrado'),
+    FOREIGN KEY (folio)
+    REFERENCES Operaciones (folio)
 );
 
 -- Inserts para la tabla Clientes
-insert into Clientes (nombres, apellidoPaterno, apellidoMaterno, codigoPostal, colonia, calle, numExterior, fechaNacimiento) values
+INSERT INTO Clientes (nombres, apellidoPaterno, apellidoMaterno, fechaNacimiento) VALUES
 ('Juan', 'Perez', 'Gonzalez', '12345', 'Centro', 'Calle Principal', '123', '1990-05-15'),
 ('Maria', 'Lopez', 'Martinez', '54321', 'Colonia Nueva', 'Avenida Principal', '456', '1988-10-25'),
 ('Pedro', 'Garcia', 'Sanchez', '67890', 'Otra Colonia', 'Calle Secundaria', '789', '1975-03-08'),
@@ -56,8 +67,21 @@ insert into Clientes (nombres, apellidoPaterno, apellidoMaterno, codigoPostal, c
 ('Alejandra', 'Gomez', 'Luna', '98765', 'Nueva Zona', 'Calle del Sol', '369', '1980-08-15'),
 ('Javier', 'Gutierrez', 'Fernandez', '56789', 'Barrio Residencial', 'Avenida de la Luna', '147', '1973-06-28');
 
+-- Inserts para la tabla Direcciones
+INSERT INTO Direcciones (codigoPostal, colonia, calle, numExterior, idCliente) VALUES
+('12345', 'Centro', 'Calle Principal', '123', 1),
+('54321', 'Colonia Nueva', 'Avenida Principal', '456', 2),
+('67890', 'Otra Colonia', 'Calle Secundaria', '789', 3),
+('13579', 'Colonia Antigua', 'Avenida Antigua', '246', 4),
+('97531', 'Barrio Viejo', 'Calle de Piedra', '135', 5),
+('24680', 'Barrio Nuevo', 'Calle de Madera', '246', 6),
+('86420', 'Rinconada', 'Calle del Rio', '753', 7),
+('45678', 'Colonia Moderna', 'Avenida de las Flores', 8),
+('98765', 'Nueva Zona', 'Calle del Sol', '369', 9),
+('56789', 'Barrio Residencial', 'Avenida de la Luna', '147', 10);
+
 -- Inserts para la tabla Cuentas
-insert into Cuentas (saldo, idCliente) values
+INSERT INTO Cuentas (saldo, idCliente) VALUES
 (1000.00, 1),
 (500.00, 2),
 (2000.00, 3),
@@ -76,7 +100,7 @@ insert into Cuentas (saldo, idCliente) values
 (1000.00, 6);
 
 -- Inserts para la tabla Operaciones
-insert into Operaciones (monto, tipo, numCuenta) values
+INSERT INTO Operaciones (monto, tipo, numCuenta) VALUES
 (500.00, 'Transferencia', 1),
 (200.00, 'Retiro sin cuenta', 3),
 (100.00, 'Transferencia', 2),
@@ -109,7 +133,7 @@ insert into Operaciones (monto, tipo, numCuenta) values
 (150.00, 'Retiro sin cuenta', 5);
 
 -- Inserts para la tabla Transferencias
-insert into Transferencias (folio) values
+INSERT INTO Transferencias (folio) VALUES
 (1),
 (3),
 (5),
@@ -127,7 +151,7 @@ insert into Transferencias (folio) values
 (29);
 
 -- Inserts para la tabla RetirosSinCuenta
-insert into RetirosSinCuenta (folio, contrasenia, estado) values
+INSERT INTO RetirosSinCuenta (folio, contrasenia, estado) VALUES
 (2, 1326, 'Pendiente'),
 (4, 5678, 'No cobrado'),
 (6, 4321, 'Cobrado'),
