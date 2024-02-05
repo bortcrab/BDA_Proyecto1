@@ -56,16 +56,16 @@ CREATE TABLE RetirosSinCuenta (
 
 -- Inserts para la tabla Clientes
 INSERT INTO Clientes (nombres, apellidoPaterno, apellidoMaterno, fechaNacimiento) VALUES
-('Juan', 'Perez', 'Gonzalez', '12345', 'Centro', 'Calle Principal', '123', '1990-05-15'),
-('Maria', 'Lopez', 'Martinez', '54321', 'Colonia Nueva', 'Avenida Principal', '456', '1988-10-25'),
-('Pedro', 'Garcia', 'Sanchez', '67890', 'Otra Colonia', 'Calle Secundaria', '789', '1975-03-08'),
-('Ana', 'Martinez', 'Gomez', '13579', 'Colonia Antigua', 'Avenida Antigua', '246', '1982-07-12'),
-('Sofia', 'Hernandez', 'Rodriguez', '97531', 'Barrio Viejo', 'Calle de Piedra', '135', '1995-11-30'),
-('Luis', 'Torres', 'Diaz', '24680', 'Barrio Nuevo', 'Calle de Madera', '246', '1978-09-18'),
-('Fernanda', 'Diaz', 'Ruiz', '86420', 'Rinconada', 'Calle del Rio', '753', '1989-04-03'),
-('Carlos', 'Sanchez', 'Perez', '45678', 'Colonia Moderna', 'Avenida de las Flores', '852', '1992-12-20'),
-('Alejandra', 'Gomez', 'Luna', '98765', 'Nueva Zona', 'Calle del Sol', '369', '1980-08-15'),
-('Javier', 'Gutierrez', 'Fernandez', '56789', 'Barrio Residencial', 'Avenida de la Luna', '147', '1973-06-28');
+('Juan', 'Perez', 'Gonzalez', '1990-05-15'),
+('Maria', 'Lopez', 'Martinez', '1988-10-25'),
+('Pedro', 'Garcia', 'Sanchez', '1975-03-08'),
+('Ana', 'Martinez', 'Gomez', '1982-07-12'),
+('Sofia', 'Hernandez', 'Rodriguez', '1995-11-30'),
+('Luis', 'Torres', 'Diaz', '1978-09-18'),
+('Fernanda', 'Diaz', 'Ruiz', '1989-04-03'),
+('Carlos', 'Sanchez', 'Perez', '1992-12-20'),
+('Alejandra', 'Gomez', 'Luna', '1980-08-15'),
+('Javier', 'Gutierrez', 'Fernandez', '1973-06-28');
 
 -- Inserts para la tabla Direcciones
 INSERT INTO Direcciones (codigoPostal, colonia, calle, numExterior, idCliente) VALUES
@@ -76,7 +76,7 @@ INSERT INTO Direcciones (codigoPostal, colonia, calle, numExterior, idCliente) V
 ('97531', 'Barrio Viejo', 'Calle de Piedra', '135', 5),
 ('24680', 'Barrio Nuevo', 'Calle de Madera', '246', 6),
 ('86420', 'Rinconada', 'Calle del Rio', '753', 7),
-('45678', 'Colonia Moderna', 'Avenida de las Flores', 8),
+('45678', 'Colonia Moderna', 'Avenida de las Flores', '476',  8),
 ('98765', 'Nueva Zona', 'Calle del Sol', '369', 9),
 ('56789', 'Barrio Residencial', 'Avenida de la Luna', '147', 10);
 
