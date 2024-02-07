@@ -42,6 +42,7 @@ CREATE TABLE Operaciones (
 
 CREATE TABLE Transferencias (
     folio INT PRIMARY KEY,
+    numCuentaReceptora INT NOT NULL,
     FOREIGN KEY (folio)
     REFERENCES Operaciones (folio)
 );
@@ -133,37 +134,37 @@ INSERT INTO Operaciones (monto, tipo, numCuenta) VALUES
 (150.00, 'Retiro sin cuenta', 5);
 
 -- Inserts para la tabla Transferencias
-INSERT INTO Transferencias (folio) VALUES
-(1),
-(3),
-(5),
-(7),
-(9),
-(11),
-(13),
-(15),
-(17),
-(19),
-(21),
-(23),
-(25),
-(27),
-(29);
+INSERT INTO Transferencias VALUES
+(1, 2),
+(3, 4),
+(5, 6),
+(7, 8),
+(9, 10),
+(11, 12),
+(13, 14),
+(15, 16),
+(17, 18),
+(19, 20),
+(21, 22),
+(23, 24),
+(25, 26),
+(27, 28),
+(29, 30);
 
 -- Inserts para la tabla RetirosSinCuenta
 INSERT INTO RetirosSinCuenta (folio, contrasenia, estado) VALUES
-(2, 1326, 'Pendiente'),
-(4, 5678, 'No cobrado'),
-(6, 4321, 'Cobrado'),
-(8, 8765, 'No cobrado'),
-(10, 9876, 'Pendiente'),
-(12, 2345, 'Cobrado'),
-(14, 6789, 'Pendiente'),
-(16, 3456, 'No cobrado'),
-(18, 7890, 'Cobrado'),
-(20, 5432, 'Pendiente'),
-(22, 8901, 'No cobrado'),
-(24, 6543, 'Cobrado'),
-(26, 2109, 'Pendiente'),
-(28, 4567, 'No cobrado'),
-(30, 1098, 'Cobrado');
+(2, 84072651, 'Pendiente'),
+(4, 30518729, 'No cobrado'),
+(6, 61930472, 'Cobrado'),
+(8, 92810634, 'No cobrado'),
+(10, 20387456, 'Pendiente'),
+(12, 74501928, 'Cobrado'),
+(14, 51263789, 'Pendiente'),
+(16, 97630214, 'No cobrado'),
+(18, 43857126, 'Cobrado'),
+(20, 27081593, 'Pendiente'),
+(22, 68193407, 'No cobrado'),
+(24, 10275938, 'Cobrado'),
+(26, 36409217, 'Pendiente'),
+(28, 80962315, 'No cobrado'),
+(30, 15743082, 'Cobrado');
