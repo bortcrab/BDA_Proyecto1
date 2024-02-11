@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import negocio.IClienteNegocio;
+import negocio.ICuentaNegocio;
 import negocio.IDireccionNegocio;
 import negocio.IOperacionNegocio;
 import negocio.NegocioException;
@@ -23,18 +24,19 @@ import negocio.NegocioException;
 public class FrmPerfil extends javax.swing.JFrame {
     IClienteNegocio clienteNegocio;
     IDireccionNegocio direccionNegocio;
+    ICuentaNegocio cuentaNegocio;
     IOperacionNegocio operacionNegocio;
     AccionCatalogoEnumerador accion;
     
     /**
      * Creates new form frmLogin
      */
-    public FrmPerfil(IClienteNegocio clienteNegocio, IDireccionNegocio direccionNegocio, /*ICuentaNegocio cuentaNegocio, */IOperacionNegocio operacionNegocio, AccionCatalogoEnumerador accion) {
+    public FrmPerfil(IClienteNegocio clienteNegocio, IDireccionNegocio direccionNegocio, ICuentaNegocio cuentaNegocio, IOperacionNegocio operacionNegocio, AccionCatalogoEnumerador accion) {
         initComponents();
         this.clienteNegocio = clienteNegocio;
         this.direccionNegocio = direccionNegocio;
+        this.cuentaNegocio = cuentaNegocio;
         this.operacionNegocio = operacionNegocio;
-//        this.cuentaNegocio = cuentaNegocio;
         this.accion = accion;
         
         if (accion == NUEVO) {
@@ -297,13 +299,13 @@ public class FrmPerfil extends javax.swing.JFrame {
         } else {
             
         }
-        FrmLogin frmLogin = new FrmLogin(clienteNegocio, direccionNegocio, operacionNegocio);
+        FrmLogin frmLogin = new FrmLogin(clienteNegocio, direccionNegocio, cuentaNegocio, operacionNegocio);
         frmLogin.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnAccionActionPerformed
 
     private void lblLoginMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblLoginMouseClicked
-        FrmLogin frmLogin = new FrmLogin(clienteNegocio, direccionNegocio, operacionNegocio);
+        FrmLogin frmLogin = new FrmLogin(clienteNegocio, direccionNegocio, cuentaNegocio, operacionNegocio);
         frmLogin.setVisible(true);
         dispose();
     }//GEN-LAST:event_lblLoginMouseClicked

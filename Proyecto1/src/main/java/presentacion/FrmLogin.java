@@ -6,6 +6,7 @@ package presentacion;
 
 import static enumeradores.AccionCatalogoEnumerador.NUEVO;
 import negocio.IClienteNegocio;
+import negocio.ICuentaNegocio;
 import negocio.IDireccionNegocio;
 import negocio.IOperacionNegocio;
 
@@ -17,16 +18,16 @@ public class FrmLogin extends javax.swing.JFrame {
     IClienteNegocio clienteNegocio;
     IDireccionNegocio direccionNegocio;
     IOperacionNegocio operacionNegocio;
-//    ICuentaNegocio cuentaNegocio;
+    ICuentaNegocio cuentaNegocio;
     
     /**
      * Creates new form frmLogin
      */
-    public FrmLogin(IClienteNegocio clienteNegocio, IDireccionNegocio direccionNegocio, /*ICuentaNegocio cuentaNegocio, */IOperacionNegocio operacionNegocio) {
+    public FrmLogin(IClienteNegocio clienteNegocio, IDireccionNegocio direccionNegocio, ICuentaNegocio cuentaNegocio, IOperacionNegocio operacionNegocio) {
         this.clienteNegocio = clienteNegocio;
         this.direccionNegocio = direccionNegocio;
         this.operacionNegocio = operacionNegocio;
-        //this.cuentaNegocio = cuentaNegocio;
+        this.cuentaNegocio = cuentaNegocio;
         initComponents();
     }
 
@@ -102,14 +103,14 @@ public class FrmLogin extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(200, 200, 200)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(jLabel1)
                     .addComponent(txtCorreo, javax.swing.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)
                     .addComponent(jLabel2)
                     .addComponent(jLabel3)
                     .addComponent(txtContrasenia, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnIngresar)
                     .addComponent(jLabel4)
-                    .addComponent(lblRegistro)
-                    .addComponent(jLabel1))
+                    .addComponent(lblRegistro))
                 .addGap(18, 18, 18)
                 .addComponent(btnRetiroSinCuenta)
                 .addGap(18, 18, 18))
@@ -143,13 +144,14 @@ public class FrmLogin extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIngresarActionPerformed
+        
         FrmMenu frmMenu = new FrmMenu(operacionNegocio);
         frmMenu.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnIngresarActionPerformed
 
     private void lblRegistroMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblRegistroMouseClicked
-        FrmPerfil frmPerfil = new FrmPerfil(clienteNegocio, direccionNegocio, operacionNegocio, NUEVO);
+        FrmPerfil frmPerfil = new FrmPerfil(clienteNegocio, direccionNegocio, cuentaNegocio, operacionNegocio, NUEVO);
         frmPerfil.setVisible(true);
         dispose();
     }//GEN-LAST:event_lblRegistroMouseClicked
