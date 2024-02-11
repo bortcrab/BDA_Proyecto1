@@ -31,7 +31,7 @@ public class OperacionDAO implements IOperacionDAO {
         try {
             List<OperacionEntidad> operacionesLista = null;
             try (Connection conexion = this.conexionBD.crearConexion()) {
-                String codigoSQL = "SELECT folio, tipo, monto, fechaHoraEjec FROM Operaciones;";
+                String codigoSQL = "SELECT idOperacion, tipo, monto, fechaHoraEjec, numCuentaEmisora FROM Operaciones;";
                 Statement comandoSQL = conexion.createStatement();
                 ResultSet resultado = comandoSQL.executeQuery(codigoSQL);
                 while (resultado.next()) {

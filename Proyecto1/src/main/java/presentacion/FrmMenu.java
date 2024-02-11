@@ -32,17 +32,20 @@ public class FrmMenu extends javax.swing.JFrame {
     private void initComponents() {
 
         btnPerfil = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        btnTransferencia = new javax.swing.JButton();
+        btnRetiroSinCuenta = new javax.swing.JButton();
+        btnRetiro = new javax.swing.JButton();
+        btnAbrirCuenta = new javax.swing.JButton();
+        btnCancelarCuenta = new javax.swing.JButton();
+        btnHistorial = new javax.swing.JButton();
+        btnDepositar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        jButton6 = new javax.swing.JButton();
+        btnCerrarSesion = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setPreferredSize(new java.awt.Dimension(600, 400));
 
-        btnPerfil.setFont(new java.awt.Font("Montserrat", 0, 24)); // NOI18N
+        btnPerfil.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         btnPerfil.setText("Perfil");
         btnPerfil.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -50,34 +53,65 @@ public class FrmMenu extends javax.swing.JFrame {
             }
         });
 
-        jButton2.setFont(new java.awt.Font("Montserrat", 0, 24)); // NOI18N
-        jButton2.setText("Transferencia");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnTransferencia.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        btnTransferencia.setText("Transferencia");
+        btnTransferencia.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnTransferenciaActionPerformed(evt);
             }
         });
 
-        jButton3.setFont(new java.awt.Font("Montserrat", 0, 24)); // NOI18N
-        jButton3.setText("Retiro sin cuenta");
+        btnRetiroSinCuenta.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        btnRetiroSinCuenta.setText("Retiro sin cuenta");
+        btnRetiroSinCuenta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRetiroSinCuentaActionPerformed(evt);
+            }
+        });
 
-        jButton4.setFont(new java.awt.Font("Montserrat", 0, 24)); // NOI18N
-        jButton4.setText("Retiro");
+        btnRetiro.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        btnRetiro.setText("Retiro");
 
-        jButton1.setFont(new java.awt.Font("Montserrat", 0, 24)); // NOI18N
-        jButton1.setText("Abrir cuenta");
+        btnAbrirCuenta.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        btnAbrirCuenta.setText("Abrir cuenta");
+        btnAbrirCuenta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAbrirCuentaActionPerformed(evt);
+            }
+        });
 
-        jButton5.setFont(new java.awt.Font("Montserrat", 0, 24)); // NOI18N
-        jButton5.setText("Cancelar cuenta");
+        btnCancelarCuenta.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        btnCancelarCuenta.setText("Cancelar cuenta");
+        btnCancelarCuenta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelarCuentaActionPerformed(evt);
+            }
+        });
 
-        jLabel1.setFont(new java.awt.Font("Montserrat", 0, 24)); // NOI18N
+        btnHistorial.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        btnHistorial.setText("Historial de operaciones");
+        btnHistorial.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHistorialActionPerformed(evt);
+            }
+        });
+
+        btnDepositar.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        btnDepositar.setText("Depósito");
+        btnDepositar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDepositarActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel1.setText("¡Bienvenido, usuario!");
 
-        jButton6.setFont(new java.awt.Font("Montserrat", 0, 24)); // NOI18N
-        jButton6.setText("Historial de operaciones");
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
+        btnCerrarSesion.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnCerrarSesion.setText("Cerrar sesión");
+        btnCerrarSesion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
+                btnCerrarSesionActionPerformed(evt);
             }
         });
 
@@ -86,38 +120,58 @@ public class FrmMenu extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(188, 188, 188)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(btnPerfil)
-                    .addComponent(jButton2)
-                    .addComponent(jButton3)
-                    .addComponent(jButton5)
-                    .addComponent(jLabel1)
-                    .addComponent(jButton6)
-                    .addComponent(jButton4)
-                    .addComponent(jButton1))
-                .addContainerGap(188, Short.MAX_VALUE))
+                .addGap(232, 232, 232)
+                .addComponent(btnCerrarSesion)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(105, 105, 105)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnTransferencia, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnDepositar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnRetiro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnRetiroSinCuenta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnAbrirCuenta)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnCancelarCuenta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnHistorial)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnPerfil, javax.swing.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)))
+                .addGap(105, 105, 105))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(121, 121, 121))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(17, 17, 17)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(24, 24, 24)
                 .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnTransferencia)
+                    .addComponent(btnDepositar))
                 .addGap(18, 18, 18)
-                .addComponent(jButton2)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnRetiro)
+                    .addComponent(btnRetiroSinCuenta))
                 .addGap(18, 18, 18)
-                .addComponent(jButton4)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAbrirCuenta)
+                    .addComponent(btnCancelarCuenta))
                 .addGap(18, 18, 18)
-                .addComponent(jButton3)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnHistorial)
+                    .addComponent(btnPerfil))
                 .addGap(18, 18, 18)
-                .addComponent(jButton1)
-                .addGap(18, 18, 18)
-                .addComponent(jButton5)
-                .addGap(18, 18, 18)
-                .addComponent(jButton6)
-                .addGap(18, 18, 18)
-                .addComponent(btnPerfil)
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addComponent(btnCerrarSesion)
+                .addGap(10, 10, 10))
         );
 
         pack();
@@ -125,19 +179,41 @@ public class FrmMenu extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnPerfilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPerfilActionPerformed
-        FrmPerfil frmPerfil = new FrmPerfil(operacionNegocio, EDITAR);
-        frmPerfil.setVisible(true);
+//        FrmPerfil frmPerfil = new FrmPerfil(operacionNegocio, EDITAR);
+//        frmPerfil.setVisible(true);
     }//GEN-LAST:event_btnPerfilActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnTransferenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTransferenciaActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnTransferenciaActionPerformed
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+    private void btnHistorialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistorialActionPerformed
         FrmHistorial frmHistorial = new FrmHistorial(operacionNegocio);
         frmHistorial.setVisible(true);
         dispose();
-    }//GEN-LAST:event_jButton6ActionPerformed
+    }//GEN-LAST:event_btnHistorialActionPerformed
+
+    private void btnCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarSesionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCerrarSesionActionPerformed
+
+    private void btnAbrirCuentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirCuentaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnAbrirCuentaActionPerformed
+
+    private void btnCancelarCuentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarCuentaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCancelarCuentaActionPerformed
+
+    private void btnDepositarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDepositarActionPerformed
+        //        FrmDeposito frmDeposito = new FrmDeposito();
+        //        frmDeposito.setVisible(true);
+        dispose();
+    }//GEN-LAST:event_btnDepositarActionPerformed
+
+    private void btnRetiroSinCuentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetiroSinCuentaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRetiroSinCuentaActionPerformed
 
 //    /**
 //     * @param args the command line arguments
@@ -175,13 +251,15 @@ public class FrmMenu extends javax.swing.JFrame {
 //    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAbrirCuenta;
+    private javax.swing.JButton btnCancelarCuenta;
+    private javax.swing.JButton btnCerrarSesion;
+    private javax.swing.JButton btnDepositar;
+    private javax.swing.JButton btnHistorial;
     private javax.swing.JButton btnPerfil;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
+    private javax.swing.JButton btnRetiro;
+    private javax.swing.JButton btnRetiroSinCuenta;
+    private javax.swing.JButton btnTransferencia;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 }

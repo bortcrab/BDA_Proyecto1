@@ -6,7 +6,9 @@ CREATE TABLE Clientes (
     nombres VARCHAR(50) NOT NULL,
     apellidoPaterno VARCHAR(50) NOT NULL,
     apellidoMaterno VARCHAR(50) NOT NULL,
-    fechaNacimiento DATE NOT NULL
+    fechaNacimiento DATE NOT NULL,
+    correo VARCHAR(255) UNIQUE NOT NULL,
+    contrasenia VARCHAR(128) NOT NULL
 );
 
 CREATE TABLE Direcciones (
@@ -33,40 +35,48 @@ CREATE TABLE Cuentas (
 CREATE TABLE Operaciones (
     folio INT AUTO_INCREMENT PRIMARY KEY,
     monto DECIMAL(15 , 2 ) NOT NULL,
-    tipo ENUM('Transferencia', 'Retiro sin cuenta') NOT NULL,
+    tipo ENUM('Transferencia', 'Retiro', 'Retiro sin cuenta', 'Depósito') NOT NULL,
     fechaHoraEjec DATETIME DEFAULT NOW() NOT NULL,
-    numCuenta INT NOT NULL,
-    FOREIGN KEY (numCuenta)
-    REFERENCES Cuentas (numCuenta)
+    numCuentaEmisora INT NOT NULL,
+    FOREIGN KEY (numCuentaEmisora) REFERENCES Cuentas (numCuenta)
 );
 
 CREATE TABLE Transferencias (
     folio INT PRIMARY KEY,
     numCuentaReceptora INT NOT NULL,
-    FOREIGN KEY (folio)
-    REFERENCES Operaciones (folio)
+    FOREIGN KEY (folio) REFERENCES Operaciones (folio)
+);
+
+CREATE TABLE Retiros (
+    folio INT PRIMARY KEY,
+    FOREIGN KEY (folio) REFERENCES Operaciones (folio)
 );
 
 CREATE TABLE RetirosSinCuenta (
     folio INT PRIMARY KEY,
     contrasenia INT NOT NULL,
     estado ENUM('Pendiente', 'Cobrado', 'No cobrado'),
-    FOREIGN KEY (folio)
-    REFERENCES Operaciones (folio)
+    fechaHoraCobro DATETIME,
+    FOREIGN KEY (folio) REFERENCES Operaciones (folio)
+);
+
+CREATE TABLE Depositos (
+    folio INT PRIMARY KEY,
+    FOREIGN KEY (folio) REFERENCES Operaciones (folio)
 );
 
 -- Inserts para la tabla Clientes
-INSERT INTO Clientes (nombres, apellidoPaterno, apellidoMaterno, fechaNacimiento) VALUES
-('Juan', 'Perez', 'Gonzalez', '1990-05-15'),
-('Maria', 'Lopez', 'Martinez', '1988-10-25'),
-('Pedro', 'Garcia', 'Sanchez', '1975-03-08'),
-('Ana', 'Martinez', 'Gomez', '1982-07-12'),
-('Sofia', 'Hernandez', 'Rodriguez', '1995-11-30'),
-('Luis', 'Torres', 'Diaz', '1978-09-18'),
-('Fernanda', 'Diaz', 'Ruiz', '1989-04-03'),
-('Carlos', 'Sanchez', 'Perez', '1992-12-20'),
-('Alejandra', 'Gomez', 'Luna', '1980-08-15'),
-('Javier', 'Gutierrez', 'Fernandez', '1973-06-28');
+INSERT INTO Clientes (nombres, apellidoPaterno, apellidoMaterno, fechaNacimiento, correo, contrasenia) VALUES
+('Juan', 'Perez', 'Gonzalez', '1990-05-15', 'a@a.com', sha2('a', 512)),
+('Maria', 'Lopez', 'Martinez', '1988-10-25', 'b@b.com', sha2('a', 512)),
+('Pedro', 'Garcia', 'Sanchez', '1975-03-08', 'c@c.com', sha2('a', 512)),
+('Ana', 'Martinez', 'Gomez', '1982-07-12', 'd@d.com', sha2('a', 512)),
+('Sofia', 'Hernandez', 'Rodriguez', '1995-11-30', 'e@e.com', sha2('a', 512)),
+('Luis', 'Torres', 'Diaz', '1978-09-18', 'f@f.com', sha2('a', 512)),
+('Fernanda', 'Diaz', 'Ruiz', '1989-04-03', 'g@g.com', sha2('a', 512)),
+('Carlos', 'Sanchez', 'Perez', '1992-12-20', 'h@h.com', sha2('a', 512)),
+('Alejandra', 'Gomez', 'Luna', '1980-08-15', 'i@i.com', sha2('a', 512)),
+('Javier', 'Gutierrez', 'Fernandez', '1973-06-28', 'j@j.com', sha2('a', 512));
 
 -- Inserts para la tabla Direcciones
 INSERT INTO Direcciones (codigoPostal, colonia, calle, numExterior, idCliente) VALUES
@@ -101,7 +111,7 @@ INSERT INTO Cuentas (saldo, idCliente) VALUES
 (1000.00, 6);
 
 -- Inserts para la tabla Operaciones
-INSERT INTO Operaciones (monto, tipo, numCuenta) VALUES
+INSERT INTO Operaciones (monto, tipo, numCuentaEmisora) VALUES
 (500.00, 'Transferencia', 1),
 (200.00, 'Retiro sin cuenta', 3),
 (100.00, 'Transferencia', 2),
