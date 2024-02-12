@@ -11,16 +11,18 @@ public class OperacionEntidad {
     private String tipo;
     private float monto;
     private Date fechaHoraEjec;
+    private int numCuentaEmisora;
 
     public OperacionEntidad() {
         
     }
     
-    public OperacionEntidad(int folio, String tipo, float monto, Date fechaHoraEjec) {
+    public OperacionEntidad(int folio, float monto, String tipo, Date fechaHoraEjec, int numCuentaEmisora) {
         this.folio = folio;
         this.tipo = tipo;
         this.monto = monto;
         this.fechaHoraEjec = fechaHoraEjec;
+        this.numCuentaEmisora = numCuentaEmisora;
     }
 
     public int getFolio() {
@@ -47,13 +49,20 @@ public class OperacionEntidad {
         this.monto = monto;
     }
 
-    public Date fechaHoraEjec() {
+    public Date getFechaHoraEjec() {
         return fechaHoraEjec;
     }
 
-    public void fechaHoraEjec(Date fechaHoraEjec) {
+    public void setFechaHoraEjec(Date fechaHoraEjec) {
         this.fechaHoraEjec = fechaHoraEjec;
     }
-    
+
+    public int getNumCuentaEmisora() {
+        return numCuentaEmisora;
+    }
+
+    public void setNumCuentaOrigen(int numCuentaEmisora) {
+        this.numCuentaEmisora = numCuentaEmisora;
+    }
     
 }

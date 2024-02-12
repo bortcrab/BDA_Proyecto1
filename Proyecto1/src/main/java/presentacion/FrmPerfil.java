@@ -7,6 +7,7 @@ package presentacion;
 import dtos.ClienteDTO;
 import dtos.Datos;
 import dtos.DireccionDTO;
+import dtos.Usuario;
 import enumeradores.AccionCatalogoEnumerador;
 import static enumeradores.AccionCatalogoEnumerador.*;
 import java.text.SimpleDateFormat;
@@ -24,32 +25,42 @@ import negocio.NegocioException;
  */
 public class FrmPerfil extends javax.swing.JFrame {
     Datos datos;
+    Usuario usuario;
     IClienteNegocio clienteNegocio;
     IDireccionNegocio direccionNegocio;
-    ICuentaNegocio cuentaNegocio;
-    IOperacionNegocio operacionNegocio;
     AccionCatalogoEnumerador accion;
     
     /**
      * Creates new form frmLogin
      */
-    public FrmPerfil(Datos datos, AccionCatalogoEnumerador accion) {
+    public FrmPerfil(Datos datos, Usuario usuario, AccionCatalogoEnumerador accion) {
         initComponents();
         this.datos = datos;
-        this.datos = datos;
+        this.usuario = usuario;
         this.clienteNegocio = datos.getClienteNegocio();
         this.direccionNegocio = datos.getDireccionNegocio();
-        this.operacionNegocio = datos.getOperacionNegocio();
-        this.cuentaNegocio = datos.getCuentaNegocio();
         this.accion = accion;
         
         if (accion == NUEVO) {
             lblTitulo.setText("Registro");
             btnAccion.setText("Registrar");
-        } else {
-            lblTitulo.setText("Perfil");
-            
+        } else if (accion == EDITAR) {
+            lblTitulo.setText("Actualizar perfil");
+            btnAccion.setText("Actualizar");
+            llenarCampos();
         }
+    }
+    
+    private void llenarCampos() {
+        txtNombre.setText(usuario.getCliente().getNombres());
+        txtApellidoP.setText(usuario.getCliente().getApellidoP());
+        txtApellidoM.setText(usuario.getCliente().getApellidoM());
+        dtchNacimiento.setDate(java.sql.Date.valueOf(usuario.getCliente().getFechaNac()));
+        txtCorreo.setText(usuario.getCliente().getCorreo());
+        txtCodigoPostal.setText(usuario.getDireccion().getCodPos());
+        txtColonia.setText(usuario.getDireccion().getColonia());
+        txtCalle.setText(usuario.getDireccion().getCalle());
+        txtNumExterior.setText(usuario.getDireccion().getNumExt());
     }
 
     /**
@@ -66,7 +77,6 @@ public class FrmPerfil extends javax.swing.JFrame {
         emptyBorder1 = (javax.swing.border.EmptyBorder)javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1);
         btnAccion = new javax.swing.JButton();
         lblTitulo = new javax.swing.JLabel();
-        lblLogin = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
@@ -98,6 +108,7 @@ public class FrmPerfil extends javax.swing.JFrame {
         txtCalle = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
         txtNumExterior = new javax.swing.JTextField();
+        btnVolver = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Banco");
@@ -113,17 +124,6 @@ public class FrmPerfil extends javax.swing.JFrame {
         lblTitulo.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         lblTitulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblTitulo.setText("Acción");
-
-        lblLogin.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        lblLogin.setForeground(new java.awt.Color(51, 102, 255));
-        lblLogin.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblLogin.setText("¿Ya tienes una cuenta?");
-        lblLogin.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        lblLogin.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lblLoginMouseClicked(evt);
-            }
-        });
 
         jPanel1.setBackground(new java.awt.Color(204, 204, 204));
 
@@ -355,6 +355,9 @@ public class FrmPerfil extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        btnVolver.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnVolver.setText("Volver");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -375,14 +378,11 @@ public class FrmPerfil extends javax.swing.JFrame {
                 .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(btnAccion, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(150, 150, 150))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(lblLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(135, 135, 135))))
+                .addContainerGap()
+                .addComponent(btnVolver)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnAccion, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -396,9 +396,9 @@ public class FrmPerfil extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnAccion)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblLogin)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAccion)
+                    .addComponent(btnVolver))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -409,28 +409,34 @@ public class FrmPerfil extends javax.swing.JFrame {
     private void btnAccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAccionActionPerformed
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         if (accion == NUEVO) {
-            lblTitulo.setText("Registro");
             ClienteDTO clienteDTO = new ClienteDTO(0, txtNombre.getText(), txtApellidoP.getText(), txtApellidoM.getText(), sdf.format(dtchNacimiento.getDate()), txtCorreo.getText(), pwdContrasenia.getText());
             try {
                 clienteDTO = clienteNegocio.guardar(clienteDTO);
                 DireccionDTO direccionDTO = new DireccionDTO(0, txtCodigoPostal.getText(), txtColonia.getText(), txtCalle.getText(), txtNumExterior.getText(), clienteDTO.getId());
                 direccionNegocio.guardar(direccionDTO);
+                FrmLogin frmLogin = new FrmLogin(datos);
+                frmLogin.setVisible(true);
             } catch (NegocioException ex) {
                 Logger.getLogger(FrmPerfil.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } else {
-            
+        } else if (accion == EDITAR) {
+            lblTitulo.setText("Registro");
+            ClienteDTO clienteDTO = new ClienteDTO(usuario.getCliente().getId(), txtNombre.getText(), txtApellidoP.getText(), txtApellidoM.getText(), sdf.format(dtchNacimiento.getDate()), txtCorreo.getText(), pwdContrasenia.getText());
+            try {
+                clienteNegocio.editar(clienteDTO);
+                DireccionDTO direccionDTO = new DireccionDTO(usuario.getDireccion().getCodigoDir(), txtCodigoPostal.getText(), txtColonia.getText(), txtCalle.getText(), txtNumExterior.getText(), clienteDTO.getId());
+                direccionNegocio.editar(direccionDTO);
+                usuario.setCliente(clienteDTO);
+                usuario.setDireccion(direccionDTO);
+                FrmMenu frmMenu = new FrmMenu(datos, usuario);
+                frmMenu.setVisible(true);
+            } catch (NegocioException ex) {
+                Logger.getLogger(FrmPerfil.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        FrmLogin frmLogin = new FrmLogin(datos);
-        frmLogin.setVisible(true);
+        
         dispose();
     }//GEN-LAST:event_btnAccionActionPerformed
-
-    private void lblLoginMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblLoginMouseClicked
-        FrmLogin frmLogin = new FrmLogin(datos);
-        frmLogin.setVisible(true);
-        dispose();
-    }//GEN-LAST:event_lblLoginMouseClicked
 
 //    /**
 //     * @param args the command line arguments
@@ -470,6 +476,7 @@ public class FrmPerfil extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAccion;
+    private javax.swing.JButton btnVolver;
     private com.toedter.calendar.JDateChooser dtchNacimiento;
     private javax.swing.border.EmptyBorder emptyBorder1;
     private javax.swing.JLabel jLabel1;
@@ -492,7 +499,6 @@ public class FrmPerfil extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JLabel lblLogin;
     private javax.swing.JLabel lblTitulo;
     private javax.swing.border.LineBorder lineBorder1;
     private javax.swing.JPasswordField pwdConfirmarContra;

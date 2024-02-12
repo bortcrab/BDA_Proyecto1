@@ -19,12 +19,14 @@ public class ClienteNegocio implements IClienteNegocio {
     @Override
     public ClienteDTO buscarCliente(ClienteDTO clienteDTO) throws NegocioException {
         try {
-            ClienteEntidad clienteEntidad = convertirClienteDTO_Entidad(clienteDTO);
-            clienteEntidad = this.clienteDAO.buscarCliente(clienteEntidad);
-            clienteDTO = convertirClienteEntidad_DTO(clienteEntidad);
+            ClienteEntidad clienteEntidad = new ClienteEntidad();
+            clienteEntidad.setCorreo(clienteDTO.getCorreo());
+            clienteEntidad.setContrasenia(clienteDTO.getContra());
+            clienteEntidad = clienteDAO.buscarCliente(clienteEntidad);
             if (clienteEntidad == null) {
                 throw new NegocioException("No se encontró el cliente con esa ID.");
             }
+            clienteDTO = convertirClienteEntidad_DTO(clienteEntidad);
             return clienteDTO;
         } catch (PersistenciaException pe) {
             System.out.println(pe.getMessage());
@@ -43,7 +45,7 @@ public class ClienteNegocio implements IClienteNegocio {
     public ClienteDTO guardar(ClienteDTO clienteDTO) throws NegocioException {
         try {
             ClienteEntidad clienteEntidad = convertirClienteDTO_Entidad(clienteDTO);
-            this.clienteDAO.guardar(clienteEntidad);
+            clienteDAO.guardar(clienteEntidad);
             clienteDTO = convertirClienteEntidad_DTO(clienteEntidad);
             return clienteDTO;
         } catch (PersistenciaException pe) {
@@ -53,7 +55,7 @@ public class ClienteNegocio implements IClienteNegocio {
     }
     
     public ClienteEntidad convertirClienteDTO_Entidad(ClienteDTO clienteDTO) {
-        ClienteEntidad clienteEntidad = new ClienteEntidad(clienteDTO.getNombres(),
+        ClienteEntidad clienteEntidad = new ClienteEntidad(clienteDTO.getId(), clienteDTO.getNombres(),
                 clienteDTO.getApellidoP(), clienteDTO.getApellidoM(), java.sql.Date.valueOf(clienteDTO.getFechaNac()),
                 clienteDTO.getCorreo(), clienteDTO.getContra());
         return clienteEntidad;
@@ -61,12 +63,13 @@ public class ClienteNegocio implements IClienteNegocio {
     
     @Override
     public void editar(ClienteDTO clienteDTO) throws NegocioException {
-//        try {
-//            this.clienteDAO.editar(clienteEntidad);
-//        } catch (PersistenciaException pe) {
-//            System.out.println(pe.getMessage());
-//            throw new NegocioException(pe.getMessage());
-//        }
+        try {
+            ClienteEntidad clienteEntidad = convertirClienteDTO_Entidad(clienteDTO);
+            clienteDAO.editar(clienteEntidad);
+        } catch (PersistenciaException pe) {
+            System.out.println(pe.getMessage());
+            throw new NegocioException(pe.getMessage());
+        }
     }
     
     private boolean esNumeroNegativo(int numero) {

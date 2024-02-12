@@ -99,8 +99,39 @@ public class DireccionDAO implements IDireccionDAO {
     }
 
     @Override
-    public void editar(DireccionEntidad t) throws PersistenciaException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void editar(DireccionEntidad direccionEntidad) throws PersistenciaException {
+        try (Connection conexion = this.conexionBD.crearConexion()) {
+            try {
+                // Desactivar el autocommit
+                conexion.setAutoCommit(false);
+                // Actualizar el cliente
+                actualizarDireccion(direccionEntidad, conexion);
+                // Confirmar la transacción
+                conexion.commit();
+                logger.log(Level.INFO, "Se editó un cliente exitosamente.");
+            } catch (SQLException ex) {
+                conexion.rollback();
+                // hacer uso de Logger
+                logger.log(Level.SEVERE, "Ocurrió un error al actualizar el cliente.");
+                throw new PersistenciaException("Ocurrió un error al editar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
+            }
+        } catch (SQLException sqle) {
+            // hacer uso de Logger
+            logger.log(Level.SEVERE, "Ocurrió un error al actualizar el cliente.", sqle);
+            throw new PersistenciaException("Ocurrió un error al registrar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
+        }
     }
     
+    private void actualizarDireccion(DireccionEntidad direccionEntidad, Connection conexion) throws SQLException {
+        String updateDireccion = "UPDATE Direcciones set codigoPostal= ?, colonia = ?, calle = ?, numExterior = ? WHERE codigoDireccion = ?";
+        try (PreparedStatement preparedStatement = conexion.prepareStatement(updateDireccion)) {
+            preparedStatement.setString(1, direccionEntidad.getCodigoPostal());
+            preparedStatement.setString(2, direccionEntidad.getColonia());
+            preparedStatement.setString(3, direccionEntidad.getCalle());
+            preparedStatement.setString(4, direccionEntidad.getNumExterior());
+            preparedStatement.setInt(5, direccionEntidad.getCodigoDireccion());
+            // Ejecutar la actualización
+            preparedStatement.executeUpdate();
+        }
+    }
 }

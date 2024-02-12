@@ -54,14 +54,20 @@ public class DireccionNegocio implements IDireccionNegocio {
     }
     
     public DireccionEntidad convertirDireccionDTO_Entidad(DireccionDTO direccionDTO) {
-        DireccionEntidad direccionEntidad = new DireccionEntidad(direccionDTO.getCodPos(), direccionDTO.getColonia(),
+        DireccionEntidad direccionEntidad = new DireccionEntidad(direccionDTO.getCodigoDir(), direccionDTO.getCodPos(), direccionDTO.getColonia(),
                 direccionDTO.getCalle(), direccionDTO.getNumExt(), direccionDTO.getIdCliente());
         return direccionEntidad;
     }
 
     @Override
-    public void editar(DireccionDTO t) throws NegocioException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void editar(DireccionDTO direccionDTO) throws NegocioException {
+        try {
+            DireccionEntidad direccionEntidad = convertirDireccionDTO_Entidad(direccionDTO);
+            direccionDAO.editar(direccionEntidad);
+        } catch (PersistenciaException pe) {
+            System.out.println(pe.getMessage());
+            throw new NegocioException(pe.getMessage());
+        }
     }
     
 }

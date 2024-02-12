@@ -14,4 +14,6 @@ import persistencia.OperacionDAO;
  */
 public interface IOperacionNegocio {
     public List<OperacionDTO> buscarOperacionesTabla() throws NegocioException;
+    
+    public OperacionDTO guardar(OperacionDTO operacionDTO) throws NegocioException;
 }

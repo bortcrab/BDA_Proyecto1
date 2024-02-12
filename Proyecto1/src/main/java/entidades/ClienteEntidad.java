@@ -22,7 +22,8 @@ public class ClienteEntidad {
     public ClienteEntidad() {
     }
     
-    public ClienteEntidad(String nombres, String apellidoPaterno, String apellidoMaterno, Date fechaNacimiento, String correo, String contrasenia) {
+    public ClienteEntidad(int idCliente, String nombres, String apellidoPaterno, String apellidoMaterno, Date fechaNacimiento, String correo, String contrasenia) {
+        this.idCliente = idCliente;
         this.nombres = nombres;
         this.apellidoPaterno = apellidoPaterno;
         this.apellidoMaterno = apellidoMaterno;

@@ -13,16 +13,18 @@ public class OperacionDTO {
     private String tipo;
     private String monto;
     private String fechaHora;
+    private int numCuentaOrigen;
     
     public OperacionDTO() {
         
     }
 
-    public OperacionDTO(int folio, String tipo, String monto, String fechaHora) {
+    public OperacionDTO(int folio, String monto, String tipo, String fechaHora, int numCuentaOrigen) {
         this.folio = folio;
         this.tipo = tipo;
         this.monto = monto;
         this.fechaHora = fechaHora;
+        this.numCuentaOrigen = numCuentaOrigen;
     }
 
     public int getFolio() {
@@ -57,5 +59,11 @@ public class OperacionDTO {
         this.fechaHora = fechaHora;
     }
 
-    
+    public int getNumCuentaOrigen() {
+        return numCuentaOrigen;
+    }
+
+    public void setNumCuentaOrigen(int numCuentaOrigen) {
+        this.numCuentaOrigen = numCuentaOrigen;
+    }
 }

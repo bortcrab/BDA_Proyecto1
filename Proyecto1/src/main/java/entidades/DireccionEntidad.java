@@ -21,7 +21,8 @@ public class DireccionEntidad {
     public DireccionEntidad() {
     }
 
-    public DireccionEntidad(String codigoPostal, String colonia, String calle, String numExterior, int idCliente) {
+    public DireccionEntidad(int codigoDireccion, String codigoPostal, String colonia, String calle, String numExterior, int idCliente) {
+        this.codigoDireccion = codigoDireccion;
         this.codigoPostal = codigoPostal;
         this.colonia = colonia;
         this.calle = calle;

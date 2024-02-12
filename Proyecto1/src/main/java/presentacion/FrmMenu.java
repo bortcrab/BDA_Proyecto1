@@ -4,7 +4,9 @@
  */
 package presentacion;
 
-import static enumeradores.AccionCatalogoEnumerador.EDITAR;
+import dtos.Datos;
+import dtos.Usuario;
+import static enumeradores.AccionCatalogoEnumerador.*;
 import negocio.IOperacionNegocio;
 
 /**
@@ -12,14 +14,17 @@ import negocio.IOperacionNegocio;
  * @author Usuario
  */
 public class FrmMenu extends javax.swing.JFrame {
-    IOperacionNegocio operacionNegocio;
+    Datos datos;
+    Usuario usuario;
     
     /**
      * Creates new form FrmPrincipal
      */
-    public FrmMenu(IOperacionNegocio operacionNegocio) {
-        this.operacionNegocio = operacionNegocio;
+    public FrmMenu(Datos datos, Usuario usuario) {
         initComponents();
+        this.datos = datos;
+        this.usuario = usuario;
+        lblBienvenida.setText("¡Bienvenido, " + usuario.getCliente().getNombres() + "!");
     }
 
     /**
@@ -39,11 +44,10 @@ public class FrmMenu extends javax.swing.JFrame {
         btnCancelarCuenta = new javax.swing.JButton();
         btnHistorial = new javax.swing.JButton();
         btnDepositar = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        lblBienvenida = new javax.swing.JLabel();
         btnCerrarSesion = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(600, 400));
 
         btnPerfil.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         btnPerfil.setText("Perfil");
@@ -71,6 +75,11 @@ public class FrmMenu extends javax.swing.JFrame {
 
         btnRetiro.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         btnRetiro.setText("Retiro");
+        btnRetiro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRetiroActionPerformed(evt);
+            }
+        });
 
         btnAbrirCuenta.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         btnAbrirCuenta.setText("Abrir cuenta");
@@ -104,8 +113,9 @@ public class FrmMenu extends javax.swing.JFrame {
             }
         });
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
-        jLabel1.setText("¡Bienvenido, usuario!");
+        lblBienvenida.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        lblBienvenida.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblBienvenida.setText("¡Bienvenido, usuario!");
 
         btnCerrarSesion.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnCerrarSesion.setText("Cerrar sesión");
@@ -143,16 +153,13 @@ public class FrmMenu extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnPerfil, javax.swing.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)))
                 .addGap(105, 105, 105))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addGap(121, 121, 121))
+            .addComponent(lblBienvenida, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(24, 24, 24)
-                .addComponent(jLabel1)
+                .addComponent(lblBienvenida)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnTransferencia)
@@ -179,41 +186,56 @@ public class FrmMenu extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnPerfilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPerfilActionPerformed
-//        FrmPerfil frmPerfil = new FrmPerfil(operacionNegocio, EDITAR);
-//        frmPerfil.setVisible(true);
+        FrmPerfil frmPerfil = new FrmPerfil(datos, usuario, EDITAR);
+        frmPerfil.setVisible(true);
+        dispose();
     }//GEN-LAST:event_btnPerfilActionPerformed
 
     private void btnTransferenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTransferenciaActionPerformed
-        // TODO add your handling code here:
+        FrmTransferencia frmTransferencia = new FrmTransferencia(datos, usuario);
+        frmTransferencia.setVisible(true);
+        dispose();     
     }//GEN-LAST:event_btnTransferenciaActionPerformed
 
     private void btnHistorialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistorialActionPerformed
-        FrmHistorial frmHistorial = new FrmHistorial(operacionNegocio);
-        frmHistorial.setVisible(true);
-        dispose();
+//        FrmHistorial frmHistorial = new FrmHistorial(operacionNegocio);
+//        frmHistorial.setVisible(true);
+//        dispose();
     }//GEN-LAST:event_btnHistorialActionPerformed
 
     private void btnCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarSesionActionPerformed
-        // TODO add your handling code here:
+        FrmLogin frmLogin = new FrmLogin(datos);
+        frmLogin.setVisible(true);
+        dispose();        
     }//GEN-LAST:event_btnCerrarSesionActionPerformed
 
     private void btnAbrirCuentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirCuentaActionPerformed
-        // TODO add your handling code here:
+        FrmAbrirCuenta frmAbrirCuenta = new FrmAbrirCuenta(datos, usuario);
+        frmAbrirCuenta.setVisible(true);
+        dispose();
     }//GEN-LAST:event_btnAbrirCuentaActionPerformed
 
     private void btnCancelarCuentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarCuentaActionPerformed
-        // TODO add your handling code here:
+        FrmCancelarCuenta frmCancelarCuenta = new FrmCancelarCuenta(datos, usuario);
+        frmCancelarCuenta.setVisible(true);
+        dispose();
     }//GEN-LAST:event_btnCancelarCuentaActionPerformed
 
     private void btnDepositarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDepositarActionPerformed
-        //        FrmDeposito frmDeposito = new FrmDeposito();
-        //        frmDeposito.setVisible(true);
+        FrmEditarCuenta frmEditarCuenta = new FrmEditarCuenta(datos, usuario, DEPOSITO);
+        frmEditarCuenta.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnDepositarActionPerformed
 
     private void btnRetiroSinCuentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetiroSinCuentaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnRetiroSinCuentaActionPerformed
+
+    private void btnRetiroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetiroActionPerformed
+        FrmEditarCuenta frmEditarCuenta = new FrmEditarCuenta(datos, usuario, RETIRO);
+        frmEditarCuenta.setVisible(true);
+        dispose();
+    }//GEN-LAST:event_btnRetiroActionPerformed
 
 //    /**
 //     * @param args the command line arguments
@@ -260,6 +282,6 @@ public class FrmMenu extends javax.swing.JFrame {
     private javax.swing.JButton btnRetiro;
     private javax.swing.JButton btnRetiroSinCuenta;
     private javax.swing.JButton btnTransferencia;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel lblBienvenida;
     // End of variables declaration//GEN-END:variables
 }

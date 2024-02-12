@@ -6,9 +6,13 @@ package presentacion;
 
 import dtos.CuentaDTO;
 import dtos.Datos;
+import dtos.OperacionDTO;
 import dtos.Usuario;
+import enumeradores.AccionCatalogoEnumerador;
+import static enumeradores.AccionCatalogoEnumerador.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.logging.Level;
@@ -16,34 +20,49 @@ import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import negocio.ICuentaNegocio;
+import negocio.IOperacionNegocio;
 import negocio.NegocioException;
 
 /**
  *
  * @author jorge
  */
-public class FrmCancelarCuenta extends javax.swing.JFrame {
+public class FrmEditarCuenta extends javax.swing.JFrame {
 
     Datos datos;
     Usuario usuario;
     ICuentaNegocio cuentaNegocio;
+    IOperacionNegocio operacionNegocio;
+    AccionCatalogoEnumerador accion;
 
     /**
-     * Creates new form FrmCuenta
+     * Creates new form FrmDeposito
      */
-    public FrmCancelarCuenta(Datos datos, Usuario usuario) {
+    public FrmEditarCuenta(Datos datos, Usuario usuario, AccionCatalogoEnumerador accion) {
         initComponents();
         this.datos = datos;
         this.usuario = usuario;
         this.cuentaNegocio = datos.getCuentaNegocio();
-
+        this.operacionNegocio = datos.getOperacionNegocio();
+        this.accion = accion;
+        
+        if (accion == DEPOSITO) {
+            lblTitulo.setText("Depósito");
+            lblSubtitulo.setText("Realiza un depósito a una de tus cuentas.");
+            btnAccion.setText("Depositar");
+        } else {
+            lblTitulo.setText("Retiro");
+            lblSubtitulo.setText("Realiza un retiro a una de tus cuentas.");
+            btnAccion.setText("Retirar");
+        }
+        
         obtenerCuentas();
     }
 
     private void obtenerCuentas() {
         try {
             List<CuentaDTO> listaCuentasDTO = cuentaNegocio.obtenerCuentas(usuario.getCliente().getId());
-            DefaultComboBoxModel<CuentaDTO> modelo = new DefaultComboBoxModel<CuentaDTO>();
+            DefaultComboBoxModel<CuentaDTO> modelo = new DefaultComboBoxModel<>();
             for (CuentaDTO cuenta : listaCuentasDTO) {
                 modelo.addElement(cuenta);
             }
@@ -70,43 +89,31 @@ public class FrmCancelarCuenta extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        txtSaldo = new javax.swing.JTextField();
-        btnConfirmar = new javax.swing.JButton();
+        btnAccion = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
-        pwdContrasenia = new javax.swing.JPasswordField();
         btnCancelar = new javax.swing.JButton();
-        comboCuentas = new javax.swing.JComboBox<>();
         jLabel5 = new javax.swing.JLabel();
+        lblTitulo = new javax.swing.JLabel();
+        lblSubtitulo = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        comboCuentas = new javax.swing.JComboBox<>();
+        txtMonto = new javax.swing.JTextField();
+        pwdContrasenia = new javax.swing.JPasswordField();
+        jLabel6 = new javax.swing.JLabel();
+        txtSaldo = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        jLabel1.setText("Cancelar cuenta");
-
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel3.setText("Cuidado, estás a punto de cancelar tu cuenta.");
-
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel2.setText("Saldo:");
-
-        txtSaldo.setEditable(false);
-        txtSaldo.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-
-        btnConfirmar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        btnConfirmar.setText("Confirmar");
-        btnConfirmar.addActionListener(new java.awt.event.ActionListener() {
+        btnAccion.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnAccion.setText("Acción");
+        btnAccion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnConfirmarActionPerformed(evt);
+                btnAccionActionPerformed(evt);
             }
         });
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel4.setText("Contraseña:");
-
-        pwdContrasenia.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
         btnCancelar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnCancelar.setText("Cancelar");
@@ -116,6 +123,19 @@ public class FrmCancelarCuenta extends javax.swing.JFrame {
             }
         });
 
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel5.setText("Cuenta:");
+
+        lblTitulo.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        lblTitulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTitulo.setText("Acción");
+
+        lblSubtitulo.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lblSubtitulo.setText("Realiza un depósito a una de tus cuentas.");
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel2.setText("Monto ($):");
+
         comboCuentas.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         comboCuentas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -123,65 +143,76 @@ public class FrmCancelarCuenta extends javax.swing.JFrame {
             }
         });
 
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel5.setText("Cuenta:");
+        txtMonto.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+
+        pwdContrasenia.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel6.setText("Saldo:");
+
+        txtSaldo.setEditable(false);
+        txtSaldo.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addGap(115, 115, 115))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel3)
-                .addGap(61, 61, 61))
+                .addComponent(lblSubtitulo)
+                .addGap(95, 95, 95))
             .addGroup(layout.createSequentialGroup()
                 .addGap(20, 20, 20)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtSaldo))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(134, 134, 134)
-                        .addComponent(btnConfirmar))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel4)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(pwdContrasenia))
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel5)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(comboCuentas, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                            .addComponent(jLabel2)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtSaldo, javax.swing.GroupLayout.PREFERRED_SIZE, 305, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnAccion))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pwdContrasenia))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtMonto))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(comboCuentas, javax.swing.GroupLayout.PREFERRED_SIZE, 339, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(20, Short.MAX_VALUE))
+            .addComponent(lblTitulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(lblTitulo)
                 .addGap(3, 3, 3)
-                .addComponent(jLabel3)
+                .addComponent(lblSubtitulo)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(comboCuentas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
+                    .addComponent(jLabel5)
+                    .addComponent(comboCuentas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(txtSaldo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(txtSaldo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtMonto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(pwdContrasenia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnConfirmar)
+                    .addComponent(btnAccion)
                     .addComponent(btnCancelar))
                 .addContainerGap(20, Short.MAX_VALUE))
         );
@@ -190,13 +221,7 @@ public class FrmCancelarCuenta extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        FrmMenu frmMenu = new FrmMenu(datos, usuario);
-        frmMenu.setVisible(true);
-        dispose();
-    }//GEN-LAST:event_btnCancelarActionPerformed
-
-    private void btnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmarActionPerformed
+    private void btnAccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAccionActionPerformed
         String contrasenia;
         try {
             contrasenia = hashContrasenia(pwdContrasenia.getText());
@@ -208,44 +233,60 @@ public class FrmCancelarCuenta extends javax.swing.JFrame {
         if (contrasenia.equals(usuario.getCliente().getContra())) {
             try {
                 CuentaDTO cuentaDTO = (CuentaDTO) comboCuentas.getSelectedItem();
-                cuentaNegocio.buscarCuenta(cuentaDTO.getNumCuenta());
-                cuentaNegocio.borrar(cuentaDTO);
+                cuentaDTO.setSaldo(txtMonto.getText());
+                String tipo;
+                if (accion == DEPOSITO) {
+                    cuentaNegocio.editar(cuentaDTO, DEPOSITO);
+                    tipo = "Depósito";
+                } else {
+                    cuentaNegocio.editar(cuentaDTO, RETIRO);
+                    tipo = "Retiro";
+                }
+                OperacionDTO operacionDTO = new OperacionDTO(0, txtMonto.getText(), tipo, new Date(0).toString(), cuentaDTO.getNumCuenta());
+                operacionNegocio.guardar(operacionDTO);
+                cuentaDTO = cuentaNegocio.buscarCuenta(cuentaDTO.getNumCuenta());
+                JOptionPane.showMessageDialog(this, "Depósito exitoso.\nNúmero de cuenta: " + cuentaDTO.getNumCuenta()
+                        + "\nSaldo actualizado: " + cuentaDTO.getSaldo(), "¡Éxito!", JOptionPane.INFORMATION_MESSAGE);
                 FrmMenu frmMenu = new FrmMenu(datos, usuario);
                 frmMenu.setVisible(true);
                 dispose();
-                JOptionPane.showMessageDialog(this, "Su cuenta ha sido cancelada.\nNúmero de cuenta: " + cuentaDTO.getNumCuenta(),
-                        "¡Éxito!", JOptionPane.INFORMATION_MESSAGE);
             } catch (NegocioException ex) {
                 Logger.getLogger(FrmAbrirCuenta.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
             System.out.println("Contraseña errónea.");
         }
-    }//GEN-LAST:event_btnConfirmarActionPerformed
+    }//GEN-LAST:event_btnAccionActionPerformed
 
     private String hashContrasenia(String contraseniaOriginal) throws NoSuchAlgorithmException {
         try {
             StringBuilder sb = new StringBuilder();
             MessageDigest md = MessageDigest.getInstance("SHA-512");
-            
+
             // Actualizar el digest con los datos proporcionados
             md.update(contraseniaOriginal.getBytes());
-            
+
             // Calcular el hash
             byte[] hashBytes = md.digest();
-            
+
             // Convertir el hash a una representación hexadecimal
             for (byte b : hashBytes) {
                 sb.append(String.format("%02x", b));
             }
-            
+
             return sb.toString();
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(FrmAbrirCuenta.class.getName()).log(Level.SEVERE, null, ex);
             throw new NoSuchAlgorithmException(ex.getMessage());
         }
     }
-    
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        FrmMenu frmMenu = new FrmMenu(datos, usuario);
+        frmMenu.setVisible(true);
+        dispose();
+    }//GEN-LAST:event_btnCancelarActionPerformed
+
     private void comboCuentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboCuentasActionPerformed
         CuentaDTO cuentaDTO = (CuentaDTO) comboCuentas.getSelectedItem();
         String saldoFormateado = formatearSaldo(Float.parseFloat(cuentaDTO.getSaldo()));
@@ -269,13 +310,13 @@ public class FrmCancelarCuenta extends javax.swing.JFrame {
 //                }
 //            }
 //        } catch (ClassNotFoundException ex) {
-//            java.util.logging.Logger.getLogger(FrmCancelarCuenta.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//            java.util.logging.Logger.getLogger(FrmEditarCuenta.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 //        } catch (InstantiationException ex) {
-//            java.util.logging.Logger.getLogger(FrmCancelarCuenta.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//            java.util.logging.Logger.getLogger(FrmEditarCuenta.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 //        } catch (IllegalAccessException ex) {
-//            java.util.logging.Logger.getLogger(FrmCancelarCuenta.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//            java.util.logging.Logger.getLogger(FrmEditarCuenta.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 //        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-//            java.util.logging.Logger.getLogger(FrmCancelarCuenta.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//            java.util.logging.Logger.getLogger(FrmEditarCuenta.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 //        }
 //        //</editor-fold>
 //        //</editor-fold>
@@ -285,21 +326,23 @@ public class FrmCancelarCuenta extends javax.swing.JFrame {
 //        /* Create and display the form */
 //        java.awt.EventQueue.invokeLater(new Runnable() {
 //            public void run() {
-//                new FrmCancelarCuenta().setVisible(true);
+//                new FrmEditarCuenta().setVisible(true);
 //            }
 //        });
 //    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAccion;
     private javax.swing.JButton btnCancelar;
-    private javax.swing.JButton btnConfirmar;
     private javax.swing.JComboBox<CuentaDTO> comboCuentas;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel lblSubtitulo;
+    private javax.swing.JLabel lblTitulo;
     private javax.swing.JPasswordField pwdContrasenia;
+    private javax.swing.JTextField txtMonto;
     private javax.swing.JTextField txtSaldo;
     // End of variables declaration//GEN-END:variables
 }

@@ -11,6 +11,10 @@ package dtos;
 public class Usuario {
     private ClienteDTO cliente;
     private DireccionDTO direccion;
+    
+    public Usuario() {
+        
+    }
 
     public Usuario(ClienteDTO cliente, DireccionDTO direccion) {
         this.cliente = cliente;

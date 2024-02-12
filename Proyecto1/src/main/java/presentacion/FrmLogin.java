@@ -158,19 +158,19 @@ public class FrmLogin extends javax.swing.JFrame {
             clienteDTO = clienteNegocio.buscarCliente(clienteDTO);
             DireccionDTO direccionDTO = direccionNegocio.buscarDireccion(clienteDTO.getId());
             Usuario usuario = new Usuario(clienteDTO, direccionDTO);
+            FrmMenu frmMenu = new FrmMenu(datos, usuario);
+            frmMenu.setVisible(true);
+            dispose();
         } catch (NegocioException ex) {
             Logger.getLogger(FrmLogin.class.getName()).log(Level.SEVERE, null, ex);
         }
 //        clienteDTO = clienteNegocio.guardar(clienteDTO);
 //        DireccionDTO direccionDTO = new DireccionDTO(txtCodigoPostal.getText(), txtColonia.getText(), txtCalle.getText(), txtNumExterior.getText(), clienteDTO.getId());
 //        direccionNegocio.guardar(direccionDTO);
-        FrmMenu frmMenu = new FrmMenu(operacionNegocio);
-        frmMenu.setVisible(true);
-        dispose();
     }//GEN-LAST:event_btnIngresarActionPerformed
 
     private void lblRegistroMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblRegistroMouseClicked
-        FrmPerfil frmPerfil = new FrmPerfil(datos, NUEVO);
+        FrmPerfil frmPerfil = new FrmPerfil(datos, new Usuario(), NUEVO);
         frmPerfil.setVisible(true);
         dispose();
     }//GEN-LAST:event_lblRegistroMouseClicked

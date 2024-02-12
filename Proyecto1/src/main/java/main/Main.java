@@ -4,6 +4,8 @@
 package main;
 
 import dtos.Datos;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import negocio.ClienteNegocio;
 import negocio.CuentaNegocio;
 import negocio.DireccionNegocio;
@@ -31,6 +33,13 @@ import presentacion.FrmLogin;
 public class Main {
 
     public static void main(String[] args) {
+        try {
+            // Establecer el Look and Feel deseado (por ejemplo, Nimbus)
+            UIManager.setLookAndFeel("com.formdev.flatlaf.FlatLightLaf");
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            ex.printStackTrace();
+        }
+        
         IConexionBD conexionBD = new ConexionBD();
         
         IClienteDAO clienteDAO = new ClienteDAO(conexionBD);

@@ -29,7 +29,7 @@ public class ClienteDAO implements IClienteDAO {
     @Override
     public ClienteEntidad buscarCliente(ClienteEntidad clienteEntidad) throws PersistenciaException {
         try (Connection conexion = this.conexionBD.crearConexion()) {
-            String codigoSQL = "SELECT * FROM Clientes WHERE correo = " + clienteEntidad.getCorreo() + " AND contrasenia = sha2(" + clienteEntidad.getContrasenia() + ", 512);";
+            String codigoSQL = "SELECT * FROM Clientes WHERE correo = '" + clienteEntidad.getCorreo() + "' AND contrasenia = sha2('" + clienteEntidad.getContrasenia() + "', 512);";
             Statement comandoSQL = conexion.createStatement();
             ResultSet resultado = comandoSQL.executeQuery(codigoSQL);
             if (resultado.next()) {
@@ -51,21 +51,23 @@ public class ClienteDAO implements IClienteDAO {
         clienteEntidad.setApellidoPaterno(resultado.getString("apellidoPaterno"));
         clienteEntidad.setApellidoMaterno(resultado.getString("apellidoMaterno"));
         clienteEntidad.setFechaNacimiento(resultado.getDate("fechaNacimiento"));
+        clienteEntidad.setCorreo(resultado.getString("correo"));
+        clienteEntidad.setContrasenia(resultado.getString("contrasenia"));
         return clienteEntidad;
     }
 
     @Override
-    public ClienteEntidad guardar(ClienteEntidad cliente) throws PersistenciaException {
+    public ClienteEntidad guardar(ClienteEntidad clienteEntidad) throws PersistenciaException {
         try (Connection conexion = this.conexionBD.crearConexion()) {
             try {
                 // Desactivar el autocommit
                 conexion.setAutoCommit(false);
                 // Insertar el cliente
-                insertarCliente(cliente, conexion);
+                insertarCliente(clienteEntidad, conexion);
                 // Confirmar la transacción
                 conexion.commit();
                 logger.log(Level.INFO, "Se agregó un cliente a la tabla.");
-                return cliente;
+                return clienteEntidad;
             } catch (SQLException ex) {
                 conexion.rollback();
                 // hacer uso de Logger
@@ -79,27 +81,61 @@ public class ClienteDAO implements IClienteDAO {
         }
     }
 
-    private void insertarCliente(ClienteEntidad cliente, Connection conexion) throws SQLException {
+    private void insertarCliente(ClienteEntidad clienteEntidad, Connection conexion) throws SQLException {
         String insertCliente = "INSERT INTO Clientes (nombres, apellidoPaterno, apellidoMaterno, fechaNacimiento, correo, contrasenia) VALUES (?, ?, ?, ?, ?, sha2(?, 512));";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(insertCliente, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setString(1, cliente.getNombres());
-            preparedStatement.setString(2, cliente.getApellidoPaterno());
-            preparedStatement.setString(3, cliente.getApellidoMaterno());
-            preparedStatement.setDate(4, cliente.getFechaNacimiento());
-            preparedStatement.setString(5, cliente.getCorreo());
-            preparedStatement.setString(6, cliente.getContrasenia());
+            preparedStatement.setString(1, clienteEntidad.getNombres());
+            preparedStatement.setString(2, clienteEntidad.getApellidoPaterno());
+            preparedStatement.setString(3, clienteEntidad.getApellidoMaterno());
+            preparedStatement.setDate(4, clienteEntidad.getFechaNacimiento());
+            preparedStatement.setString(5, clienteEntidad.getCorreo());
+            preparedStatement.setString(6, clienteEntidad.getContrasenia());
             // Ejecutar la inserción
             preparedStatement.executeUpdate();
             // Obtener las claves generadas
             ResultSet resultado = preparedStatement.getGeneratedKeys();
             while (resultado.next()) {
-                cliente.setIdCliente(resultado.getInt(1));
+                clienteEntidad.setIdCliente(resultado.getInt(1));
             }
         }
     }
 
     @Override
-    public void editar(ClienteEntidad cliente) throws PersistenciaException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void editar(ClienteEntidad clienteEntidad) throws PersistenciaException {
+        try (Connection conexion = this.conexionBD.crearConexion()) {
+            try {
+                // Desactivar el autocommit
+                conexion.setAutoCommit(false);
+                // Actualizar el cliente
+                actualizarCliente(clienteEntidad, conexion);
+                // Confirmar la transacción
+                conexion.commit();
+                logger.log(Level.INFO, "Se editó un cliente exitosamente.");
+            } catch (SQLException ex) {
+                conexion.rollback();
+                // hacer uso de Logger
+                logger.log(Level.SEVERE, "Ocurrió un error al actualizar el cliente.");
+                throw new PersistenciaException("Ocurrió un error al editar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
+            }
+        } catch (SQLException sqle) {
+            // hacer uso de Logger
+            logger.log(Level.SEVERE, "Ocurrió un error al actualizar el cliente.", sqle);
+            throw new PersistenciaException("Ocurrió un error al registrar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
+        }
+    }
+    
+    private void actualizarCliente(ClienteEntidad clienteEntidad, Connection conexion) throws SQLException {
+        String updateCliente = "UPDATE Clientes set nombres = ?, apellidoPaterno = ?, apellidoMaterno = ?, fechaNacimiento = ?, correo = ?, contrasenia = sha2(?, 512) WHERE idCliente = ?;";
+        try (PreparedStatement preparedStatement = conexion.prepareStatement(updateCliente)) {
+            preparedStatement.setString(1, clienteEntidad.getNombres());
+            preparedStatement.setString(2, clienteEntidad.getApellidoPaterno());
+            preparedStatement.setString(3, clienteEntidad.getApellidoMaterno());
+            preparedStatement.setDate(4, clienteEntidad.getFechaNacimiento());
+            preparedStatement.setString(5, clienteEntidad.getCorreo());
+            preparedStatement.setString(6, clienteEntidad.getContrasenia());
+            preparedStatement.setInt(7, clienteEntidad.getIdCliente());
+            // Ejecutar la actualización
+            preparedStatement.executeUpdate();
+        }
     }
 }

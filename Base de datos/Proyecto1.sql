@@ -24,12 +24,11 @@ CREATE TABLE Direcciones (
 
 CREATE TABLE Cuentas (
     numCuenta INT AUTO_INCREMENT PRIMARY KEY,
-    saldo DECIMAL(15 , 2 ) NOT NULL,
+    saldo DECIMAL(15 , 2) NOT NULL,
     fechaApertura DATE NOT NULL DEFAULT (CURRENT_DATE()),
     estaEliminado BIT DEFAULT 0 NOT NULL,
     idCliente INT NOT NULL,
-    FOREIGN KEY (idCliente)
-    REFERENCES Clientes (idCliente)
+    FOREIGN KEY (idCliente) REFERENCES Clientes (idCliente)
 );
 
 CREATE TABLE Operaciones (
@@ -64,6 +63,15 @@ CREATE TABLE Depositos (
     folio INT PRIMARY KEY,
     FOREIGN KEY (folio) REFERENCES Operaciones (folio)
 );
+
+CREATE VIEW todasOperaciones AS
+SELECT o.folio, o.tipo, o.monto, o.fechaHoraEjec, o.numCuentaEmisora, t.numCuentaReceptora,
+rsc.contrasenia, rsc.fechaHoraCobro 
+FROM Operaciones o
+LEFT JOIN Transferencias t on o.folio = t.folio
+LEFT JOIN Retiros r on o.folio = r.folio
+LEFT JOIN RetirosSinCuenta rsc on o.folio = rsc.folio
+LEFT JOIN Depositos d on o.folio = d.folio;
 
 -- Inserts para la tabla Clientes
 INSERT INTO Clientes (nombres, apellidoPaterno, apellidoMaterno, fechaNacimiento, correo, contrasenia) VALUES
@@ -113,68 +121,73 @@ INSERT INTO Cuentas (saldo, idCliente) VALUES
 -- Inserts para la tabla Operaciones
 INSERT INTO Operaciones (monto, tipo, numCuentaEmisora) VALUES
 (500.00, 'Transferencia', 1),
-(200.00, 'Retiro sin cuenta', 3),
-(100.00, 'Transferencia', 2),
-(300.00, 'Retiro sin cuenta', 4),
+(200.00, 'Retiro', 3),
+(100.00, 'Retiro sin cuenta', 2),
+(300.00, 'Depósito', 4),
 (150.00, 'Transferencia', 3),
-(200.00, 'Retiro sin cuenta', 8),
-(400.00, 'Transferencia', 4),
-(250.00, 'Retiro sin cuenta', 12),
+(200.00, 'Retiro', 8),
+(400.00, 'Retiro sin cuenta', 4),
+(250.00, 'Depósito', 12),
 (100.00, 'Transferencia', 14),
-(150.00, 'Retiro sin cuenta', 16),
-(200.00, 'Transferencia', 16),
-(350.00, 'Retiro sin cuenta', 4),
+(150.00, 'Retiro', 16),
+(200.00, 'Retiro sin cuenta', 16),
+(350.00, 'Depósito', 4),
 (400.00, 'Transferencia', 14),
-(200.00, 'Retiro sin cuenta', 2),
-(100.00, 'Transferencia', 2),
-(300.00, 'Retiro sin cuenta', 2),
+(200.00, 'Retiro', 2),
+(100.00, 'Retiro sin cuenta', 2),
+(300.00, 'Depósito', 2),
 (200.00, 'Transferencia', 11),
-(150.00, 'Retiro sin cuenta', 5),
-(250.00, 'Transferencia', 7),
-(150.00, 'Retiro sin cuenta', 9),
+(150.00, 'Retiro', 5),
+(250.00, 'Retiro sin cuenta', 7),
+(150.00, 'Depósito', 9),
 (200.00, 'Transferencia', 11),
-(300.00, 'Retiro sin cuenta', 13),
-(100.00, 'Transferencia', 15),
-(200.00, 'Retiro sin cuenta', 10),
+(300.00, 'Retiro', 13),
+(100.00, 'Retiro sin cuenta', 15),
+(200.00, 'Depósito', 10),
 (150.00, 'Transferencia', 12),
-(250.00, 'Retiro sin cuenta', 9),
-(200.00, 'Transferencia', 8),
-(300.00, 'Retiro sin cuenta', 7),
+(250.00, 'Retiro', 9),
+(200.00, 'Retiro sin cuenta', 8),
+(300.00, 'Depósito', 7),
 (100.00, 'Transferencia', 6),
-(150.00, 'Retiro sin cuenta', 5);
+(150.00, 'Retiro', 5);
 
 -- Inserts para la tabla Transferencias
 INSERT INTO Transferencias VALUES
 (1, 2),
-(3, 4),
 (5, 6),
-(7, 8),
 (9, 10),
-(11, 12),
 (13, 14),
-(15, 16),
 (17, 18),
-(19, 20),
 (21, 22),
-(23, 24),
 (25, 26),
-(27, 28),
 (29, 30);
 
 -- Inserts para la tabla RetirosSinCuenta
-INSERT INTO RetirosSinCuenta (folio, contrasenia, estado) VALUES
-(2, 84072651, 'Pendiente'),
-(4, 30518729, 'No cobrado'),
-(6, 61930472, 'Cobrado'),
-(8, 92810634, 'No cobrado'),
-(10, 20387456, 'Pendiente'),
-(12, 74501928, 'Cobrado'),
-(14, 51263789, 'Pendiente'),
-(16, 97630214, 'No cobrado'),
-(18, 43857126, 'Cobrado'),
-(20, 27081593, 'Pendiente'),
-(22, 68193407, 'No cobrado'),
-(24, 10275938, 'Cobrado'),
-(26, 36409217, 'Pendiente'),
-(28, 80962315, 'No cobrado'),
-(30, 15743082, 'Cobrado');
+INSERT INTO Retiros  VALUES
+(2),
+(6),
+(10),
+(14),
+(18),
+(22),
+(26),
+(30);
+
+-- Inserts para la tabla RetirosSinCuenta
+INSERT INTO RetirosSinCuenta VALUES
+(3, 84072651, 'Pendiente', null),
+(7, 30518729, 'No cobrado', null),
+(11, 61930472, 'Cobrado', now()),
+(15, 92810634, 'No cobrado', null),
+(19, 20387456, 'Pendiente', null),
+(23, 74501928, 'Cobrado', now()),
+(27, 51263789, 'Pendiente', null);
+
+INSERT INTO Depositos  VALUES
+(4),
+(8),
+(12),
+(16),
+(20),
+(24),
+(28);

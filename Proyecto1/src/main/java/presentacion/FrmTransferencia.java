@@ -4,17 +4,60 @@
  */
 package presentacion;
 
+import dtos.CuentaDTO;
+import dtos.Datos;
+import dtos.OperacionDTO;
+import dtos.Usuario;
+import static enumeradores.AccionCatalogoEnumerador.DEPOSITO;
+import static enumeradores.AccionCatalogoEnumerador.RETIRO;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
+import java.text.NumberFormat;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
+import negocio.ICuentaNegocio;
+import negocio.IOperacionNegocio;
+import negocio.NegocioException;
+
 /**
  *
  * @author jorge
  */
 public class FrmTransferencia extends javax.swing.JFrame {
 
+    Datos datos;
+    Usuario usuario;
+    ICuentaNegocio cuentaNegocio;
+    IOperacionNegocio operacionNegocio;
+
     /**
      * Creates new form FrmDeposito
      */
-    public FrmTransferencia() {
+    public FrmTransferencia(Datos datos, Usuario usuario) {
         initComponents();
+        this.datos = datos;
+        this.usuario = usuario;
+        this.cuentaNegocio = datos.getCuentaNegocio();
+        this.operacionNegocio = datos.getOperacionNegocio();
+
+        obtenerCuentas();
+    }
+
+    private void obtenerCuentas() {
+        try {
+            List<CuentaDTO> listaCuentasDTO = cuentaNegocio.obtenerCuentas(usuario.getCliente().getId());
+            DefaultComboBoxModel<CuentaDTO> modelo = new DefaultComboBoxModel<>();
+            for (CuentaDTO cuenta : listaCuentasDTO) {
+                modelo.addElement(cuenta);
+            }
+            comboCuentas.setModel(modelo);
+        } catch (NegocioException ex) {
+            Logger.getLogger(FrmCancelarCuenta.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -33,7 +76,7 @@ public class FrmTransferencia extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        comboOrigen = new javax.swing.JComboBox<>();
+        comboCuentas = new javax.swing.JComboBox<>();
         txtMonto = new javax.swing.JTextField();
         pwdContrasenia = new javax.swing.JPasswordField();
         jLabel6 = new javax.swing.JLabel();
@@ -71,10 +114,9 @@ public class FrmTransferencia extends javax.swing.JFrame {
         jLabel3.setText("Realiza una transferencia a quien quieras.");
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel2.setText("Monto:");
+        jLabel2.setText("Monto ($):");
 
-        comboOrigen.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        comboOrigen.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboCuentas.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
         txtMonto.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
@@ -93,11 +135,11 @@ public class FrmTransferencia extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(jLabel1)
-                .addGap(151, 151, 151))
+                .addGap(169, 169, 169))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel3)
-                .addGap(97, 97, 97))
+                .addGap(115, 115, 115))
             .addGroup(layout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -105,24 +147,23 @@ public class FrmTransferencia extends javax.swing.JFrame {
                         .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnConfirmar))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel5)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(comboOrigen, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel6)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtDestino))
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel4)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(pwdContrasenia))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addComponent(jLabel2)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtMonto, javax.swing.GroupLayout.PREFERRED_SIZE, 367, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(24, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pwdContrasenia, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(comboCuentas, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtMonto))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtDestino, javax.swing.GroupLayout.PREFERRED_SIZE, 306, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(25, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -134,7 +175,7 @@ public class FrmTransferencia extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(comboOrigen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(comboCuentas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
@@ -147,74 +188,122 @@ public class FrmTransferencia extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(pwdContrasenia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnConfirmar)
-                    .addComponent(btnCancelar))
-                .addGap(28, 28, 28))
+                    .addComponent(btnCancelar)
+                    .addComponent(btnConfirmar))
+                .addGap(25, 25, 25))
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmarActionPerformed
-        //FrmMenu frmMenu = new FrmMenu(operacionNegocio);
-        //frmMenu.setVisible(true);
-        dispose();
+        String contrasenia;
+        try {
+            contrasenia = hashContrasenia(pwdContrasenia.getText());
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(FrmAbrirCuenta.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Error al cifrar la contraseña.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (contrasenia.equals(usuario.getCliente().getContra())) {
+            try {
+                CuentaDTO cuentaDTO = (CuentaDTO) comboCuentas.getSelectedItem();
+                cuentaDTO.setSaldo(txtMonto.getText());
+                
+                OperacionDTO operacionDTO = new OperacionDTO(0, txtMonto.getText(), "Transferencia", new Date(0).toString(), cuentaDTO.getNumCuenta());
+                operacionNegocio.guardar(operacionDTO);
+                cuentaDTO = cuentaNegocio.buscarCuenta(cuentaDTO.getNumCuenta());
+                JOptionPane.showMessageDialog(this, "Depósito exitoso.\nNúmero de cuenta: " + cuentaDTO.getNumCuenta()
+                        + "\nSaldo actualizado: " + cuentaDTO.getSaldo(), "¡Éxito!", JOptionPane.INFORMATION_MESSAGE);
+                FrmMenu frmMenu = new FrmMenu(datos, usuario);
+                frmMenu.setVisible(true);
+                dispose();
+            } catch (NegocioException ex) {
+                Logger.getLogger(FrmAbrirCuenta.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            System.out.println("Contraseña errónea.");
+        }
     }//GEN-LAST:event_btnConfirmarActionPerformed
 
+    private String hashContrasenia(String contraseniaOriginal) throws NoSuchAlgorithmException {
+        try {
+            StringBuilder sb = new StringBuilder();
+            MessageDigest md = MessageDigest.getInstance("SHA-512");
+
+            // Actualizar el digest con los datos proporcionados
+            md.update(contraseniaOriginal.getBytes());
+
+            // Calcular el hash
+            byte[] hashBytes = md.digest();
+
+            // Convertir el hash a una representación hexadecimal
+            for (byte b : hashBytes) {
+                sb.append(String.format("%02x", b));
+            }
+
+            return sb.toString();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(FrmAbrirCuenta.class.getName()).log(Level.SEVERE, null, ex);
+            throw new NoSuchAlgorithmException(ex.getMessage());
+        }
+    }
+    
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         //FrmMenu frmMenu = new FrmMenu(operacionNegocio);
         //frmMenu.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FrmTransferencia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FrmTransferencia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FrmTransferencia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FrmTransferencia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new FrmTransferencia().setVisible(true);
-            }
-        });
-    }
+//    /**
+//     * @param args the command line arguments
+//     */
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(FrmTransferencia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(FrmTransferencia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(FrmTransferencia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(FrmTransferencia.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//        //</editor-fold>
+//        //</editor-fold>
+//        //</editor-fold>
+//        //</editor-fold>
+//        //</editor-fold>
+//        //</editor-fold>
+//        //</editor-fold>
+//
+//        /* Create and display the form */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                new FrmTransferencia().setVisible(true);
+//            }
+//        });
+//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnConfirmar;
-    private javax.swing.JComboBox<String> comboOrigen;
+    private javax.swing.JComboBox<CuentaDTO> comboCuentas;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
