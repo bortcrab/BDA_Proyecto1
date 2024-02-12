@@ -8,8 +8,8 @@ import java.sql.Date;
  */
 public class OperacionEntidad {
     private int folio;
-    private String tipo;
     private float monto;
+    private String tipo;
     private Date fechaHoraEjec;
     private int numCuentaEmisora;
 

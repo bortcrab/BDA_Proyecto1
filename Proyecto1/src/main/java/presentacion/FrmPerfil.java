@@ -357,6 +357,11 @@ public class FrmPerfil extends javax.swing.JFrame {
 
         btnVolver.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnVolver.setText("Volver");
+        btnVolver.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVolverActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -437,6 +442,17 @@ public class FrmPerfil extends javax.swing.JFrame {
         
         dispose();
     }//GEN-LAST:event_btnAccionActionPerformed
+
+    private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
+        if (accion == NUEVO) {
+            FrmLogin frmLogin = new FrmLogin(datos);
+            frmLogin.setVisible(true);
+        } else {
+            FrmMenu frmMenu = new FrmMenu(datos, usuario);
+            frmMenu.setVisible(true);
+        }
+        dispose();
+    }//GEN-LAST:event_btnVolverActionPerformed
 
 //    /**
 //     * @param args the command line arguments

@@ -176,7 +176,9 @@ public class FrmLogin extends javax.swing.JFrame {
     }//GEN-LAST:event_lblRegistroMouseClicked
 
     private void btnRetiroSinCuentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetiroSinCuentaActionPerformed
-        //FrmRetiroSinCuenta frmRetiroSinCuenta
+        FrmRetiroSinCuenta frmRetiroSinCuenta = new FrmRetiroSinCuenta(datos);
+        frmRetiroSinCuenta.setVisible(true);
+        dispose();
     }//GEN-LAST:event_btnRetiroSinCuentaActionPerformed
 
 //    /**

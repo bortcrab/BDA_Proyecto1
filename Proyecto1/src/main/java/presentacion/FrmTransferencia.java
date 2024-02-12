@@ -253,8 +253,8 @@ public class FrmTransferencia extends javax.swing.JFrame {
     }
     
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        //FrmMenu frmMenu = new FrmMenu(operacionNegocio);
-        //frmMenu.setVisible(true);
+        FrmMenu frmMenu = new FrmMenu(datos, usuario);
+        frmMenu.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 

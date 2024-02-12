@@ -4,10 +4,13 @@
  */
 package presentacion;
 
+import dtos.Datos;
 import dtos.OperacionDTO;
+import dtos.Usuario;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import negocio.ICuentaNegocio;
 import negocio.IOperacionNegocio;
 import negocio.NegocioException;
 
@@ -16,23 +19,29 @@ import negocio.NegocioException;
  * @author Usuario
  */
 public class FrmHistorial extends javax.swing.JFrame {
-    private final IOperacionNegocio operacionNegocio;
+    private Datos datos;
+    private Usuario usuario;
+    private IOperacionNegocio operacionNegocio;
+    private ICuentaNegocio cuentaNegocio;
     
     /**
      * Creates new form FrmHistorial
      */
-    public FrmHistorial(IOperacionNegocio operacionNegocio) {
+    public FrmHistorial(Datos datos, Usuario usuario) {
         initComponents();
-        this.operacionNegocio = operacionNegocio;
+        this.datos = datos;
+        this.usuario = usuario;
+        this.operacionNegocio = datos.getOperacionNegocio();
+        this.cuentaNegocio = datos.getCuentaNegocio();
 //        tblOperaciones.getColumnModel().getColumn(1).setMinWidth(0);
 //        tblOperaciones.getColumnModel().getColumn(1).setMaxWidth(0);
 //        tblOperaciones.getColumnModel().getColumn(1).setWidth(0);
-        cargarClientesEnTabla();
+        //cargarOperacionesEnTabla();
     }
     
-    private void cargarClientesEnTabla() {
+    private void cargarOperacionesEnTabla() {
         try {
-            List<OperacionDTO> operacionesLista = this.operacionNegocio.buscarOperacionesTabla();
+            List<OperacionDTO> operacionesLista = operacionNegocio.buscarOperacionesTabla(usuario.getCliente().getId());
             this.llenarTablaClientes(operacionesLista);
         } catch (NegocioException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Información", JOptionPane.ERROR_MESSAGE);
@@ -118,7 +127,7 @@ public class FrmHistorial extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Folio", "Tipo", "Monto", "Fecha y hora", "Origen", "Destino", "Contraseña", "Fecha y hora de cobro", "Estado"
+                "Folio", "Tipo", "Monto", "Fecha y hora ejecución", "Origen", "Destino", "Contraseña", "Fecha y hora de cobro", "Estado"
             }
         ));
         jScrollPane2.setViewportView(tblOperaciones);
@@ -256,18 +265,17 @@ public class FrmHistorial extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(btnVolver)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 888, Short.MAX_VALUE)
                         .addComponent(btnLimpiar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnBuscar)
-                        .addContainerGap())
+                        .addComponent(btnBuscar))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 775, Short.MAX_VALUE)
-                        .addGap(6, 6, 6))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 1000, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -275,8 +283,8 @@ public class FrmHistorial extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())))
+                        .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

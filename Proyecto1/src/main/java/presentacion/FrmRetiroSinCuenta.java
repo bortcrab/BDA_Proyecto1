@@ -4,17 +4,22 @@
  */
 package presentacion;
 
+import dtos.Datos;
+import dtos.Usuario;
+
 /**
  *
  * @author jorge
  */
 public class FrmRetiroSinCuenta extends javax.swing.JFrame {
-
+    Datos datos;
+    
     /**
      * Creates new form FrmRetiroSinCuenta
      */
-    public FrmRetiroSinCuenta() {
+    public FrmRetiroSinCuenta(Datos datos) {
         initComponents();
+        this.datos = datos;
     }
 
     /**
@@ -139,6 +144,7 @@ public class FrmRetiroSinCuenta extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRetirarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetirarActionPerformed
@@ -147,8 +153,8 @@ public class FrmRetiroSinCuenta extends javax.swing.JFrame {
     }//GEN-LAST:event_btnRetirarActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        //FrmMenu frmMenu = new FrmMenu();
-        //frmMenu.setVisible(true);
+        FrmLogin frmLogin = new FrmLogin(datos);
+        frmLogin.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 

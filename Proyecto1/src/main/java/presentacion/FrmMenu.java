@@ -198,9 +198,9 @@ public class FrmMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTransferenciaActionPerformed
 
     private void btnHistorialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistorialActionPerformed
-//        FrmHistorial frmHistorial = new FrmHistorial(operacionNegocio);
-//        frmHistorial.setVisible(true);
-//        dispose();
+        FrmHistorial frmHistorial = new FrmHistorial(datos, usuario);
+        frmHistorial.setVisible(true);
+        dispose();
     }//GEN-LAST:event_btnHistorialActionPerformed
 
     private void btnCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarSesionActionPerformed
@@ -228,7 +228,9 @@ public class FrmMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDepositarActionPerformed
 
     private void btnRetiroSinCuentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetiroSinCuentaActionPerformed
-        // TODO add your handling code here:
+        FrmAutorizarRetiroSinCuenta frmAutorizar = new FrmAutorizarRetiroSinCuenta(datos, usuario);
+        frmAutorizar.setVisible(true);
+        dispose();
     }//GEN-LAST:event_btnRetiroSinCuentaActionPerformed
 
     private void btnRetiroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetiroActionPerformed

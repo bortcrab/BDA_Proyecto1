@@ -29,19 +29,29 @@ public class OperacionDAO implements IOperacionDAO {
     }
     
     @Override
-    public List<OperacionEntidad> buscarOperacionesTabla() throws PersistenciaException {
+    public List<OperacionEntidad> buscarOperacionesTabla(int idCliente) throws PersistenciaException {
         try {
             List<OperacionEntidad> operacionesLista = null;
             try (Connection conexion = this.conexionBD.crearConexion()) {
-                String codigoSQL = "SELECT idOperacion, tipo, monto, fechaHoraEjec, numCuentaEmisora FROM Operaciones;";
+                String codigoSQL = "SELECT o.folio, o.tipo, o.monto, o.fechaHoraEjec,\n" +
+"o.numCuentaEmisora, t.numCuentaReceptora,\n" +
+"rsc.contrasenia, rsc.fechaHoraCobro  FROM Operaciones o\n" +
+"LEFT JOIN Transferencias t ON o.folio = t.folio\n" +
+"LEFT JOIN Retiros r ON o.folio = r.folio\n" +
+"LEFT JOIN RetirosSinCuenta rsc ON o.folio = rsc.folio\n" +
+"LEFT JOIN Depositos d ON o.folio = d.folio\n" +
+"INNER JOIN Cuentas cu on o.numCuentaEmisora = numCuenta\n" +
+"INNER JOIN Clientes cl on cu.idCliente = cl.idCliente\n" +
+"WHERE cl.idCliente = " + idCliente + ";";
                 Statement comandoSQL = conexion.createStatement();
                 ResultSet resultado = comandoSQL.executeQuery(codigoSQL);
                 while (resultado.next()) {
                     if (operacionesLista == null) {
                         operacionesLista = new ArrayList<>();
                     }
-                    //OperacionEntidad operacionEntidad = new OperacionEntidad(0, 0, codigoSQL, fechaHoraEjec, 0);
-                    //operacionesLista.add(operacionEntidad);
+                    OperacionEntidad operacionEntidad = new OperacionEntidad();
+                    operacionEntidad.setFolio(resultado.getInt("o.folio"));
+                    operacionesLista.add(operacionEntidad);
                 }
             }
             //logger.log(Level.INFO, "Se obtuvo la lista de clientes.");

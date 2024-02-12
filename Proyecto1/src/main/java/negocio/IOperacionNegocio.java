@@ -13,7 +13,7 @@ import persistencia.OperacionDAO;
  * @author Usuario
  */
 public interface IOperacionNegocio {
-    public List<OperacionDTO> buscarOperacionesTabla() throws NegocioException;
+    public List<OperacionDTO> buscarOperacionesTabla(int idCliente) throws NegocioException;
     
     public OperacionDTO guardar(OperacionDTO operacionDTO) throws NegocioException;
 }

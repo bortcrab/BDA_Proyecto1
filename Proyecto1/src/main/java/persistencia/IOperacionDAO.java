@@ -12,7 +12,7 @@ import java.util.List;
  * @author Usuario
  */
 public interface IOperacionDAO {
-    public List<OperacionEntidad> buscarOperacionesTabla() throws PersistenciaException;
+    public List<OperacionEntidad> buscarOperacionesTabla(int idCliente) throws PersistenciaException;
     
     public OperacionEntidad guardar(OperacionEntidad operacionEntidad) throws PersistenciaException;
 }

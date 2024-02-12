@@ -4,7 +4,9 @@
  */
 package negocio;
 
+import dtos.Datos;
 import dtos.OperacionDTO;
+import dtos.Usuario;
 import entidades.OperacionEntidad;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +18,6 @@ import persistencia.PersistenciaException;
  * @author Usuario
  */
 public class OperacionNegocio implements IOperacionNegocio {
-
     private IOperacionDAO operacionDAO;
 
     public OperacionNegocio(IOperacionDAO operacionDAO) {
@@ -24,9 +25,9 @@ public class OperacionNegocio implements IOperacionNegocio {
     }
 
     @Override
-    public List<OperacionDTO> buscarOperacionesTabla() throws NegocioException {
+    public List<OperacionDTO> buscarOperacionesTabla(int idCliente) throws NegocioException {
         try {
-            List<OperacionEntidad> operacionesEntidadesLista = this.operacionDAO.buscarOperacionesTabla();
+            List<OperacionEntidad> operacionesEntidadesLista = operacionDAO.buscarOperacionesTabla(idCliente);
             List<OperacionDTO> operacionesLista = convertirListaOperacionEntidad_DTO(operacionesEntidadesLista);
             if (operacionesLista == null) {
                 throw new NegocioException("No ha realizado ninguna operación.");
