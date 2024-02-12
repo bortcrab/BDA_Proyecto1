@@ -11,7 +11,7 @@ import entidades.DireccionEntidad;
  * @author jorge
  */
 public interface IDireccionDAO {
-    public DireccionEntidad buscarPorId(int id) throws PersistenciaException;
+    public DireccionEntidad buscarDireccion(int idCliente) throws PersistenciaException;
 
     public void guardar(DireccionEntidad direccionEntidad) throws PersistenciaException;
 

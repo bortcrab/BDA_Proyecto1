@@ -4,17 +4,25 @@
  */
 package presentacion;
 
+import dtos.ClienteDTO;
+import dtos.Datos;
+import dtos.DireccionDTO;
+import dtos.Usuario;
 import static enumeradores.AccionCatalogoEnumerador.NUEVO;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import negocio.IClienteNegocio;
 import negocio.ICuentaNegocio;
 import negocio.IDireccionNegocio;
 import negocio.IOperacionNegocio;
+import negocio.NegocioException;
 
 /**
  *
  * @author Usuario
  */
 public class FrmLogin extends javax.swing.JFrame {
+    Datos datos;
     IClienteNegocio clienteNegocio;
     IDireccionNegocio direccionNegocio;
     IOperacionNegocio operacionNegocio;
@@ -23,11 +31,12 @@ public class FrmLogin extends javax.swing.JFrame {
     /**
      * Creates new form frmLogin
      */
-    public FrmLogin(IClienteNegocio clienteNegocio, IDireccionNegocio direccionNegocio, ICuentaNegocio cuentaNegocio, IOperacionNegocio operacionNegocio) {
-        this.clienteNegocio = clienteNegocio;
-        this.direccionNegocio = direccionNegocio;
-        this.operacionNegocio = operacionNegocio;
-        this.cuentaNegocio = cuentaNegocio;
+    public FrmLogin(Datos datos) {
+        this.datos = datos;
+        this.clienteNegocio = datos.getClienteNegocio();
+        this.direccionNegocio = datos.getDireccionNegocio();
+        this.operacionNegocio = datos.getOperacionNegocio();
+        this.cuentaNegocio = datos.getCuentaNegocio();
         initComponents();
     }
 
@@ -144,14 +153,24 @@ public class FrmLogin extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIngresarActionPerformed
-        
+        ClienteDTO clienteDTO = new ClienteDTO(txtCorreo.getText(), txtContrasenia.getText());
+        try {
+            clienteDTO = clienteNegocio.buscarCliente(clienteDTO);
+            DireccionDTO direccionDTO = direccionNegocio.buscarDireccion(clienteDTO.getId());
+            Usuario usuario = new Usuario(clienteDTO, direccionDTO);
+        } catch (NegocioException ex) {
+            Logger.getLogger(FrmLogin.class.getName()).log(Level.SEVERE, null, ex);
+        }
+//        clienteDTO = clienteNegocio.guardar(clienteDTO);
+//        DireccionDTO direccionDTO = new DireccionDTO(txtCodigoPostal.getText(), txtColonia.getText(), txtCalle.getText(), txtNumExterior.getText(), clienteDTO.getId());
+//        direccionNegocio.guardar(direccionDTO);
         FrmMenu frmMenu = new FrmMenu(operacionNegocio);
         frmMenu.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnIngresarActionPerformed
 
     private void lblRegistroMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblRegistroMouseClicked
-        FrmPerfil frmPerfil = new FrmPerfil(clienteNegocio, direccionNegocio, cuentaNegocio, operacionNegocio, NUEVO);
+        FrmPerfil frmPerfil = new FrmPerfil(datos, NUEVO);
         frmPerfil.setVisible(true);
         dispose();
     }//GEN-LAST:event_lblRegistroMouseClicked

@@ -21,8 +21,25 @@ public class DireccionNegocio implements IDireccionNegocio {
     }
     
     @Override
-    public int buscarPorId(int id) throws NegocioException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public DireccionDTO buscarDireccion(int idCliente) throws NegocioException {
+        try {
+            DireccionEntidad direccionEntidad = this.direccionDAO.buscarDireccion(idCliente);
+            if (direccionEntidad == null) {
+                throw new NegocioException("No se encontró el direccion con esa ID.");
+            }
+            DireccionDTO direccionDTO = convertirDireccionEntidad_DTO(direccionEntidad);
+            return direccionDTO;
+        } catch (PersistenciaException pe) {
+            System.out.println(pe.getMessage());
+            throw new NegocioException(pe.getMessage());
+        }
+    }
+    
+    public DireccionDTO convertirDireccionEntidad_DTO(DireccionEntidad direccionEntidad) {
+        DireccionDTO clienteDTO = new DireccionDTO(direccionEntidad.getCodigoDireccion(), direccionEntidad.getCodigoPostal(),
+                direccionEntidad.getColonia(), direccionEntidad.getCalle(), direccionEntidad.getNumExterior(),
+                direccionEntidad.getIdCliente());
+        return clienteDTO;
     }
 
     @Override

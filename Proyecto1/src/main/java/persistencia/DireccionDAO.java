@@ -4,6 +4,7 @@
  */
 package persistencia;
 
+import entidades.ClienteEntidad;
 import entidades.DireccionEntidad;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,8 +27,33 @@ public class DireccionDAO implements IDireccionDAO {
     }
     
     @Override
-    public DireccionEntidad buscarPorId(int id) throws PersistenciaException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public DireccionEntidad buscarDireccion(int idCliente) throws PersistenciaException {
+        DireccionEntidad direccionEntidad = new DireccionEntidad();
+        try (Connection conexion = this.conexionBD.crearConexion()) {
+            String codigoSQL = "SELECT * FROM Direcciones WHERE idCliente = " + idCliente + ";";
+            Statement comandoSQL = conexion.createStatement();
+            ResultSet resultado = comandoSQL.executeQuery(codigoSQL);
+            if (resultado.next()) {
+                direccionEntidad = convertirResultado(resultado);
+            }
+            //logger.log(Level.INFO, "Se obtuvieron los datos del cliente: " + clienteEntidad.getIdCliente());
+            return direccionEntidad;
+        } catch (SQLException sqle) {
+            // Hacer uso de Logger
+            logger.log(Level.SEVERE, "Ocurrió un error al obtener los datos del cliente.", sqle);
+            throw new PersistenciaException("Ocurrió un error al leer la base de datos, inténtelo de nuevo y si el error persiste comuníquese con el encargado del sistema.");
+        }
+    }
+    
+    public DireccionEntidad convertirResultado(ResultSet resultado) throws SQLException {
+        DireccionEntidad direccionEntidad = new DireccionEntidad();
+        direccionEntidad.setCodigoDireccion(resultado.getInt("codigoDireccion"));
+        direccionEntidad.setCodigoPostal(resultado.getString("codigoPostal"));
+        direccionEntidad.setColonia(resultado.getString("colonia"));
+        direccionEntidad.setCalle(resultado.getString("calle"));
+        direccionEntidad.setNumExterior(resultado.getString("numExterior"));
+        direccionEntidad.setIdCliente(resultado.getInt("idCliente"));
+        return direccionEntidad;
     }
 
     @Override

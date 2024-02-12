@@ -9,7 +9,7 @@ package dtos;
  * @author Diego Valenzuela Parra
  */
 public class DireccionDTO {
-    private int codigoDireccion;
+    private int codigoDir;
     private String codPos;
     private String colonia;
     private String calle;
@@ -20,7 +20,8 @@ public class DireccionDTO {
         
     }
 
-    public DireccionDTO(String codPos, String colonia, String calle, String numExt, int idCliente) {
+    public DireccionDTO(int codigoDir, String codPos, String colonia, String calle, String numExt, int idCliente) {
+        this.codigoDir = codigoDir;
         this.codPos = codPos;
         this.colonia = colonia;
         this.calle = calle;
@@ -28,12 +29,12 @@ public class DireccionDTO {
         this.idCliente = idCliente;
     }
 
-    public int getCodigoDireccion() {
-        return codigoDireccion;
+    public int getCodigoDir() {
+        return codigoDir;
     }
 
-    public void setCodigoDireccion(int codigoDireccion) {
-        this.codigoDireccion = codigoDireccion;
+    public void setCodigoDireccion(int codigoDir) {
+        this.codigoDir = codigoDir;
     }
 
     public String getCodPos() {

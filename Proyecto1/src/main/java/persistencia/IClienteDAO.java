@@ -11,7 +11,7 @@ import entidades.ClienteEntidad;
  * @author jorge
  */
 public interface IClienteDAO {
-    public ClienteEntidad buscarPorId(int id) throws PersistenciaException;
+    public ClienteEntidad buscarCliente(ClienteEntidad clienteEntidad) throws PersistenciaException;
 
     public ClienteEntidad guardar(ClienteEntidad clienteEntidad) throws PersistenciaException;
 

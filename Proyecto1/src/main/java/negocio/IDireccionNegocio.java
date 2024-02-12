@@ -12,7 +12,7 @@ import dtos.DireccionDTO;
  * @author jorge
  */
 public interface IDireccionNegocio {
-    public int buscarPorId(int id) throws NegocioException;
+    public DireccionDTO buscarDireccion(int idCliente) throws NegocioException;
 
     public void guardar(DireccionDTO direccionDTO) throws NegocioException;
 

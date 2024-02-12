@@ -17,19 +17,15 @@ public class ClienteNegocio implements IClienteNegocio {
     }
     
     @Override
-    public int buscarPorId(int id) throws NegocioException {
+    public ClienteDTO buscarCliente(ClienteDTO clienteDTO) throws NegocioException {
         try {
-            if (id < 1) {
-                throw new NegocioException("El ID no es válido.");
-            }
-            
-            ClienteEntidad clienteEntidad = this.clienteDAO.buscarPorId(id);
-            ClienteDTO clienteDTO = convertirClienteEntidad_DTO(clienteEntidad);
+            ClienteEntidad clienteEntidad = convertirClienteDTO_Entidad(clienteDTO);
+            clienteEntidad = this.clienteDAO.buscarCliente(clienteEntidad);
+            clienteDTO = convertirClienteEntidad_DTO(clienteEntidad);
             if (clienteEntidad == null) {
                 throw new NegocioException("No se encontró el cliente con esa ID.");
             }
-            
-            return clienteDTO.getId();
+            return clienteDTO;
         } catch (PersistenciaException pe) {
             System.out.println(pe.getMessage());
             throw new NegocioException(pe.getMessage());
@@ -57,7 +53,7 @@ public class ClienteNegocio implements IClienteNegocio {
     }
     
     public ClienteEntidad convertirClienteDTO_Entidad(ClienteDTO clienteDTO) {
-        ClienteEntidad clienteEntidad = new ClienteEntidad(clienteDTO.getId(), clienteDTO.getNombres(),
+        ClienteEntidad clienteEntidad = new ClienteEntidad(clienteDTO.getNombres(),
                 clienteDTO.getApellidoP(), clienteDTO.getApellidoM(), java.sql.Date.valueOf(clienteDTO.getFechaNac()),
                 clienteDTO.getCorreo(), clienteDTO.getContra());
         return clienteEntidad;

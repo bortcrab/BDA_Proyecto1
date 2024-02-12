@@ -18,35 +18,40 @@ import java.util.logging.Logger;
  * @author jorge
  */
 public class ClienteDAO implements IClienteDAO {
+
     public IConexionBD conexionBD;
     private Logger logger = Logger.getLogger(ClienteDAO.class.getName());
-    
+
     public ClienteDAO(IConexionBD conexionBD) {
         this.conexionBD = conexionBD;
     }
-    
+
     @Override
-    public ClienteEntidad buscarPorId(int id) throws PersistenciaException {
-//        try (Connection conexion = this.conexionBD.crearConexion()) {
-//            ClienteEntidad clienteEntidad = new ClienteEntidad();
-//            String codigoSQL = "SELECT idcliente, nombres, apellidoPaterno, apellidoMaterno, estaEliminado FROM clientes WHERE idcliente = " + id + ";";
-//            Statement comandoSQL = conexion.createStatement();
-//            ResultSet resultado = comandoSQL.executeQuery(codigoSQL);
-//            if (resultado.next()) {
-//                clienteEntidad.setIdCliente(resultado.getInt("idcliente"));
-//                clienteEntidad.setNombres(resultado.getString("nombres"));
-//                clienteEntidad.setApellidoPaterno(resultado.getString("apellidoPaterno"));
-//                clienteEntidad.setApellidoMaterno(resultado.getString("apellidoMaterno"));
-//                clienteEntidad.setEstaEliminado(resultado.getBoolean("estaEliminado"));
-//            }
-//            logger.log(Level.INFO, "Se obtuvieron los datos del cliente: " + clienteEntidad.getIdCliente());
-//            return clienteEntidad;
-//        } catch (SQLException sqle) {
-//            // Hacer uso de Logger
-//            logger.log(Level.SEVERE, "Ocurrió un error al obtener los datos del cliente.", sqle);
-//            throw new PersistenciaException("Ocurrió un error al leer la base de datos, inténtelo de nuevo y si el error persiste comuníquese con el encargado del sistema.");
-//        }
-        return null;
+    public ClienteEntidad buscarCliente(ClienteEntidad clienteEntidad) throws PersistenciaException {
+        try (Connection conexion = this.conexionBD.crearConexion()) {
+            String codigoSQL = "SELECT * FROM Clientes WHERE correo = " + clienteEntidad.getCorreo() + " AND contrasenia = sha2(" + clienteEntidad.getContrasenia() + ", 512);";
+            Statement comandoSQL = conexion.createStatement();
+            ResultSet resultado = comandoSQL.executeQuery(codigoSQL);
+            if (resultado.next()) {
+                clienteEntidad = convertirResultado(resultado);
+            }
+            logger.log(Level.INFO, "Se obtuvieron los datos del cliente: " + clienteEntidad.getIdCliente());
+            return clienteEntidad;
+        } catch (SQLException sqle) {
+            // Hacer uso de Logger
+            logger.log(Level.SEVERE, "Ocurrió un error al obtener los datos del cliente.", sqle);
+            throw new PersistenciaException("Ocurrió un error al leer la base de datos, inténtelo de nuevo y si el error persiste comuníquese con el encargado del sistema.");
+        }
+    }
+
+    public ClienteEntidad convertirResultado(ResultSet resultado) throws SQLException {
+        ClienteEntidad clienteEntidad = new ClienteEntidad();
+        clienteEntidad.setIdCliente(resultado.getInt("idCliente"));
+        clienteEntidad.setNombres(resultado.getString("nombres"));
+        clienteEntidad.setApellidoPaterno(resultado.getString("apellidoPaterno"));
+        clienteEntidad.setApellidoMaterno(resultado.getString("apellidoMaterno"));
+        clienteEntidad.setFechaNacimiento(resultado.getDate("fechaNacimiento"));
+        return clienteEntidad;
     }
 
     @Override
@@ -73,7 +78,7 @@ public class ClienteDAO implements IClienteDAO {
             throw new PersistenciaException("Ocurrió un error al agregar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
         }
     }
-    
+
     private void insertarCliente(ClienteEntidad cliente, Connection conexion) throws SQLException {
         String insertCliente = "INSERT INTO Clientes (nombres, apellidoPaterno, apellidoMaterno, fechaNacimiento, correo, contrasenia) VALUES (?, ?, ?, ?, ?, sha2(?, 512));";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(insertCliente, Statement.RETURN_GENERATED_KEYS)) {
@@ -92,7 +97,6 @@ public class ClienteDAO implements IClienteDAO {
             }
         }
     }
-
 
     @Override
     public void editar(ClienteEntidad cliente) throws PersistenciaException {

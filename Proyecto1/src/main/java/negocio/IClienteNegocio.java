@@ -4,7 +4,7 @@ import dtos.ClienteDTO;
 import persistencia.PersistenciaException;
 
 public interface IClienteNegocio {
-    public int buscarPorId(int id) throws NegocioException;
+    public ClienteDTO buscarCliente(ClienteDTO clienteDTO) throws NegocioException;
 
     public ClienteDTO guardar(ClienteDTO clienteDTO) throws NegocioException;
 

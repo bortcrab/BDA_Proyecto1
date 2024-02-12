@@ -20,8 +20,9 @@ public class ClienteDTO {
     public ClienteDTO() {
         
     }
-
-    public ClienteDTO(String nombres, String apellidoP, String apellidoM, String fechaNac, String correo, String contra) {
+    
+    public ClienteDTO(int id, String nombres, String apellidoP, String apellidoM, String fechaNac, String correo, String contra) {
+        this.id = id;
         this.nombres = nombres;
         this.apellidoP = apellidoP;
         this.apellidoM = apellidoM;
@@ -30,12 +31,7 @@ public class ClienteDTO {
         this.contra = contra;
     }
     
-    public ClienteDTO(int id, String nombres, String apellidoP, String apellidoM, String fechaNac, String correo, String contra) {
-        this.id = id;
-        this.nombres = nombres;
-        this.apellidoP = apellidoP;
-        this.apellidoM = apellidoM;
-        this.fechaNac = fechaNac;
+    public ClienteDTO(String correo, String contra) {
         this.correo = correo;
         this.contra = contra;
     }

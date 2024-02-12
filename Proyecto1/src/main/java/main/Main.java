@@ -3,6 +3,7 @@
  */
 package main;
 
+import dtos.Datos;
 import negocio.ClienteNegocio;
 import negocio.CuentaNegocio;
 import negocio.DireccionNegocio;
@@ -31,8 +32,6 @@ public class Main {
 
     public static void main(String[] args) {
         IConexionBD conexionBD = new ConexionBD();
-        IOperacionDAO operacionDAO = new OperacionDAO(conexionBD);
-        IOperacionNegocio operacionNegocio = new OperacionNegocio(operacionDAO);
         
         IClienteDAO clienteDAO = new ClienteDAO(conexionBD);
         IClienteNegocio clienteNegocio = new ClienteNegocio(clienteDAO);
@@ -42,8 +41,13 @@ public class Main {
         
         ICuentaDAO cuentaDAO = new CuentaDAO(conexionBD);
         ICuentaNegocio cuentaNegocio = new CuentaNegocio(cuentaDAO);
+        
+        IOperacionDAO operacionDAO = new OperacionDAO(conexionBD);
+        IOperacionNegocio operacionNegocio = new OperacionNegocio(operacionDAO);
+        
+        Datos datos = new Datos(clienteNegocio, direccionNegocio, cuentaNegocio, operacionNegocio);
 
-        FrmLogin principal = new FrmLogin(clienteNegocio, direccionNegocio, cuentaNegocio, operacionNegocio);
+        FrmLogin principal = new FrmLogin(datos);
         principal.setVisible(true);
     }
 }
