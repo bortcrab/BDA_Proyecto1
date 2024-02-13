@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
@@ -76,8 +77,9 @@ public class FrmEditarCuenta extends javax.swing.JFrame {
     }
 
     private String formatearSaldo(float saldo) {
-        NumberFormat formatter = NumberFormat.getCurrencyInstance();
-        return formatter.format(saldo);
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.US);
+        String saldoFormateado = formatter.format(saldo);
+        return saldoFormateado;
     }
 
     /**

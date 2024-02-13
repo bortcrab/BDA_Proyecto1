@@ -57,6 +57,4 @@ public class Datos {
     public void setOperacionNegocio(IOperacionNegocio operacionNegocio) {
         this.operacionNegocio = operacionNegocio;
     }
-    
-    
 }
