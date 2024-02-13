@@ -16,4 +16,6 @@ public interface IClienteDAO {
     public ClienteEntidad guardar(ClienteEntidad clienteEntidad) throws PersistenciaException;
 
     public void editar(ClienteEntidad clienteEntidad) throws PersistenciaException;
+    
+    public String obtenerContrasenia(int idCliente) throws PersistenciaException;
 }

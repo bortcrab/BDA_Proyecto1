@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import negocio.IClienteNegocio;
 import negocio.ICuentaNegocio;
 import negocio.NegocioException;
 
@@ -27,6 +28,7 @@ public class FrmCancelarCuenta extends javax.swing.JFrame {
 
     Datos datos;
     Usuario usuario;
+    IClienteNegocio clienteNegocio;
     ICuentaNegocio cuentaNegocio;
 
     /**
@@ -36,6 +38,7 @@ public class FrmCancelarCuenta extends javax.swing.JFrame {
         initComponents();
         this.datos = datos;
         this.usuario = usuario;
+        this.clienteNegocio = datos.getClienteNegocio();
         this.cuentaNegocio = datos.getCuentaNegocio();
 
         obtenerCuentas();
@@ -198,15 +201,14 @@ public class FrmCancelarCuenta extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmarActionPerformed
-        String contrasenia;
+        String contrasenia = "";
         try {
-            contrasenia = hashContrasenia(pwdContrasenia.getText());
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(FrmAbrirCuenta.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(this, "Error al cifrar la contraseña.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+            contrasenia = clienteNegocio.obtenerContrasenia(usuario.getCliente().getId());
+        } catch (NegocioException ex) {
+            Logger.getLogger(FrmDepositoRetiro.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if (contrasenia.equals(usuario.getCliente().getContra())) {
+
+        if (contrasenia.equals(pwdContrasenia.getText())) {
             try {
                 CuentaDTO cuentaDTO = (CuentaDTO) comboCuentas.getSelectedItem();
                 cuentaNegocio.buscarCuenta(cuentaDTO.getNumCuenta());

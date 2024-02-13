@@ -5,13 +5,17 @@
 package persistencia;
 
 import entidades.ClienteEntidad;
+import java.security.Key;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  *
@@ -29,7 +33,7 @@ public class ClienteDAO implements IClienteDAO {
     @Override
     public ClienteEntidad buscarCliente(ClienteEntidad clienteEntidad) throws PersistenciaException {
         try (Connection conexion = this.conexionBD.crearConexion()) {
-            String codigoSQL = "SELECT * FROM Clientes WHERE correo = '" + clienteEntidad.getCorreo() + "' AND contrasenia = sha2('" + clienteEntidad.getContrasenia() + "', 512);";
+            String codigoSQL = "SELECT * FROM Clientes WHERE correo = '" + clienteEntidad.getCorreo() + "' AND contrasenia = AES_ENCRYPT('" + clienteEntidad.getContrasenia() + "', 'pipucatepipucate');";
             Statement comandoSQL = conexion.createStatement();
             ResultSet resultado = comandoSQL.executeQuery(codigoSQL);
             if (resultado.next()) {
@@ -41,6 +45,8 @@ public class ClienteDAO implements IClienteDAO {
             // Hacer uso de Logger
             logger.log(Level.SEVERE, "Ocurrió un error al obtener los datos del cliente.", sqle);
             throw new PersistenciaException("Ocurrió un error al leer la base de datos, inténtelo de nuevo y si el error persiste comuníquese con el encargado del sistema.");
+        } catch (Exception ex) {
+            throw new PersistenciaException(ex.getMessage());
         }
     }
 
@@ -82,7 +88,7 @@ public class ClienteDAO implements IClienteDAO {
     }
 
     private void insertarCliente(ClienteEntidad clienteEntidad, Connection conexion) throws SQLException {
-        String insertCliente = "INSERT INTO Clientes (nombres, apellidoPaterno, apellidoMaterno, fechaNacimiento, correo, contrasenia) VALUES (?, ?, ?, ?, ?, sha2(?, 512));";
+        String insertCliente = "INSERT INTO Clientes (nombres, apellidoPaterno, apellidoMaterno, fechaNacimiento, correo, contrasenia) VALUES (?, ?, ?, ?, ?, AES_ENCRYPT(?, A'pipucatepipucate'));";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(insertCliente, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, clienteEntidad.getNombres());
             preparedStatement.setString(2, clienteEntidad.getApellidoPaterno());
@@ -137,5 +143,45 @@ public class ClienteDAO implements IClienteDAO {
             // Ejecutar la actualización
             preparedStatement.executeUpdate();
         }
+    }
+    
+    public String obtenerContrasenia(int idCliente) throws PersistenciaException {
+        String contrasenia = "";
+        try (Connection conexion = this.conexionBD.crearConexion()) {
+            String codigoSQL = "SELECT contrasenia FROM Clientes WHERE idCliente = " + idCliente + ";";
+            Statement comandoSQL = conexion.createStatement();
+            ResultSet resultado = comandoSQL.executeQuery(codigoSQL);
+            if (resultado.next()) {
+                // Clave secreta AES
+                String clave = "pipucatepipucate";
+
+                // Convertir clave de String a byte array
+                byte[] keyBytes = clave.getBytes("UTF-8");
+
+                // Crear instancia de SecretKeySpec para la clave
+                Key secretKey = new SecretKeySpec(keyBytes, "AES");
+
+                // Crear instancia de Cipher para realizar la desencriptación
+                Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+                cipher.init(Cipher.DECRYPT_MODE, secretKey);
+                
+                byte[] encryptedBytes = resultado.getBytes("contrasenia");
+
+                // Desencriptar el campo VARBINARY
+                byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+
+                // Convertir el resultado desencriptado a String o realizar el procesamiento necesario
+                contrasenia = new String(decryptedBytes, "UTF-8");
+            }
+            //logger.log(Level.INFO, "Se obtuvieron los datos del cliente: " + clienteEntidad.getIdCliente());
+            return contrasenia;
+        } catch (SQLException sqle) {
+            // Hacer uso de Logger
+            //logger.log(Level.SEVERE, "Ocurrió un error al obtener los datos del cliente.", sqle);
+            throw new PersistenciaException("Ocurrió un error al leer la base de datos, inténtelo de nuevo y si el error persiste comuníquese con el encargado del sistema.");
+        } catch (Exception ex) {
+            Logger.getLogger(OperacionDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 }

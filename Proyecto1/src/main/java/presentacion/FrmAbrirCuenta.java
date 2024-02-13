@@ -6,13 +6,16 @@ package presentacion;
 
 import dtos.CuentaDTO;
 import dtos.Datos;
+import dtos.OperacionDTO;
 import dtos.Usuario;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import negocio.IClienteNegocio;
 import negocio.ICuentaNegocio;
+import negocio.IOperacionNegocio;
 import negocio.NegocioException;
 
 /**
@@ -22,7 +25,9 @@ import negocio.NegocioException;
 public class FrmAbrirCuenta extends javax.swing.JFrame {
     Datos datos;
     Usuario usuario;
+    IClienteNegocio clienteNegocio;
     ICuentaNegocio cuentaNegocio;
+    IOperacionNegocio operacionNegocio;
     
     /**
      * Creates new form FrmCuenta
@@ -31,7 +36,9 @@ public class FrmAbrirCuenta extends javax.swing.JFrame {
         initComponents();
         this.datos = datos;
         this.usuario = usuario;
+        this.clienteNegocio = datos.getClienteNegocio();
         this.cuentaNegocio = datos.getCuentaNegocio();
+        this.operacionNegocio = datos.getOperacionNegocio();
     }
 
     /**
@@ -150,18 +157,24 @@ public class FrmAbrirCuenta extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmarActionPerformed
-        String contrasenia;
+        String contrasenia = "";
         try {
-            contrasenia = hashContrasenia(pwdContrasenia.getText());
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(FrmAbrirCuenta.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(this, "Error al cifrar la contraseña.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+            contrasenia = clienteNegocio.obtenerContrasenia(usuario.getCliente().getId());
+        } catch (NegocioException ex) {
+            Logger.getLogger(FrmDepositoRetiro.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if (contrasenia.equals(usuario.getCliente().getContra())) {
+
+        if (contrasenia.equals(pwdContrasenia.getText())) {
             try {
                 CuentaDTO cuentaDTO = new CuentaDTO(0, txtMonto.getText(), "", usuario.getCliente().getId());
                 cuentaDTO = cuentaNegocio.guardar(cuentaDTO);
+                if (Float.parseFloat(txtMonto.getText()) > 0) {
+                    OperacionDTO operacionDTO = new OperacionDTO();
+                    operacionDTO.setMonto(txtMonto.getText());
+                    operacionDTO.setTipo("Depósito");
+                    operacionDTO.setNumCuentaOrigen(cuentaDTO.getNumCuenta());
+                    operacionNegocio.guardar(operacionDTO);
+                }
                 FrmMenu frmMenu = new FrmMenu(datos, usuario);
                 frmMenu.setVisible(true);
                 dispose();

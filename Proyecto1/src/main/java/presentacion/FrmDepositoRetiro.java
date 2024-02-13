@@ -12,7 +12,6 @@ import enumeradores.AccionCatalogoEnumerador;
 import static enumeradores.AccionCatalogoEnumerador.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Date;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
@@ -20,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import negocio.IClienteNegocio;
 import negocio.ICuentaNegocio;
 import negocio.IOperacionNegocio;
 import negocio.NegocioException;
@@ -28,10 +28,11 @@ import negocio.NegocioException;
  *
  * @author jorge
  */
-public class FrmEditarCuenta extends javax.swing.JFrame {
+public class FrmDepositoRetiro extends javax.swing.JFrame {
 
     Datos datos;
     Usuario usuario;
+    IClienteNegocio clienteNegocio;
     ICuentaNegocio cuentaNegocio;
     IOperacionNegocio operacionNegocio;
     AccionCatalogoEnumerador accion;
@@ -39,14 +40,15 @@ public class FrmEditarCuenta extends javax.swing.JFrame {
     /**
      * Creates new form FrmDeposito
      */
-    public FrmEditarCuenta(Datos datos, Usuario usuario, AccionCatalogoEnumerador accion) {
+    public FrmDepositoRetiro(Datos datos, Usuario usuario, AccionCatalogoEnumerador accion) {
         initComponents();
         this.datos = datos;
         this.usuario = usuario;
+        this.clienteNegocio = datos.getClienteNegocio();
         this.cuentaNegocio = datos.getCuentaNegocio();
         this.operacionNegocio = datos.getOperacionNegocio();
         this.accion = accion;
-        
+
         if (accion == DEPOSITO) {
             lblTitulo.setText("Depósito");
             lblSubtitulo.setText("Realiza un depósito a una de tus cuentas.");
@@ -56,7 +58,7 @@ public class FrmEditarCuenta extends javax.swing.JFrame {
             lblSubtitulo.setText("Realiza un retiro a una de tus cuentas.");
             btnAccion.setText("Retirar");
         }
-        
+
         obtenerCuentas();
     }
 
@@ -224,15 +226,14 @@ public class FrmEditarCuenta extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAccionActionPerformed
-        String contrasenia;
+        String contrasenia = "";
         try {
-            contrasenia = hashContrasenia(pwdContrasenia.getText());
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(FrmAbrirCuenta.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(this, "Error al cifrar la contraseña.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+            contrasenia = clienteNegocio.obtenerContrasenia(usuario.getCliente().getId());
+        } catch (NegocioException ex) {
+            Logger.getLogger(FrmDepositoRetiro.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if (contrasenia.equals(usuario.getCliente().getContra())) {
+
+        if (contrasenia.equals(pwdContrasenia.getText())) {
             try {
                 CuentaDTO cuentaDTO = (CuentaDTO) comboCuentas.getSelectedItem();
                 cuentaDTO.setSaldo(txtMonto.getText());
@@ -244,7 +245,10 @@ public class FrmEditarCuenta extends javax.swing.JFrame {
                     cuentaNegocio.editar(cuentaDTO, RETIRO);
                     tipo = "Retiro";
                 }
-                OperacionDTO operacionDTO = new OperacionDTO(0, txtMonto.getText(), tipo, new Date(0).toString(), cuentaDTO.getNumCuenta());
+                OperacionDTO operacionDTO = new OperacionDTO();
+                operacionDTO.setMonto(txtMonto.getText());
+                operacionDTO.setTipo(tipo);
+                operacionDTO.setNumCuentaOrigen(cuentaDTO.getNumCuenta());
                 operacionNegocio.guardar(operacionDTO);
                 cuentaDTO = cuentaNegocio.buscarCuenta(cuentaDTO.getNumCuenta());
                 JOptionPane.showMessageDialog(this, "Depósito exitoso.\nNúmero de cuenta: " + cuentaDTO.getNumCuenta()
@@ -312,13 +316,13 @@ public class FrmEditarCuenta extends javax.swing.JFrame {
 //                }
 //            }
 //        } catch (ClassNotFoundException ex) {
-//            java.util.logging.Logger.getLogger(FrmEditarCuenta.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//            java.util.logging.Logger.getLogger(FrmDepositoRetiro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 //        } catch (InstantiationException ex) {
-//            java.util.logging.Logger.getLogger(FrmEditarCuenta.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//            java.util.logging.Logger.getLogger(FrmDepositoRetiro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 //        } catch (IllegalAccessException ex) {
-//            java.util.logging.Logger.getLogger(FrmEditarCuenta.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//            java.util.logging.Logger.getLogger(FrmDepositoRetiro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 //        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-//            java.util.logging.Logger.getLogger(FrmEditarCuenta.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//            java.util.logging.Logger.getLogger(FrmDepositoRetiro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 //        }
 //        //</editor-fold>
 //        //</editor-fold>
@@ -328,7 +332,7 @@ public class FrmEditarCuenta extends javax.swing.JFrame {
 //        /* Create and display the form */
 //        java.awt.EventQueue.invokeLater(new Runnable() {
 //            public void run() {
-//                new FrmEditarCuenta().setVisible(true);
+//                new FrmDepositoRetiro().setVisible(true);
 //            }
 //        });
 //    }

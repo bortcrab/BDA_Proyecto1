@@ -8,7 +8,7 @@ CREATE TABLE Clientes (
     apellidoMaterno VARCHAR(50) NOT NULL,
     fechaNacimiento DATE NOT NULL,
     correo VARCHAR(255) UNIQUE NOT NULL,
-    contrasenia VARCHAR(128) NOT NULL
+    contrasenia VARBINARY(255) NOT NULL
 );
 
 CREATE TABLE Direcciones (
@@ -40,6 +40,10 @@ CREATE TABLE Operaciones (
     FOREIGN KEY (numCuentaEmisora) REFERENCES Cuentas (numCuenta)
 );
 
+select * from operaciones where fechaHoraEjec between '2024-02-12' AND '2024-02-18';
+
+SELECT o.folio, o.monto, o.tipo, o.fechaHoraEjec,o.numCuentaEmisora, t.numCuentaReceptora,rsc.contrasenia, rsc.fechaHoraCobro  FROM Operaciones o LEFT JOIN Transferencias t ON o.folio = t.folioLEFT JOIN Retiros r ON o.folio = r.folioLEFT JOIN RetirosSinCuenta rsc ON o.folio = rsc.folioLEFT JOIN Depositos d ON o.folio = d.folioINNER JOIN Cuentas cu on o.numCuentaEmisora = cu.numCuentaINNER JOIN Clientes cl on cu.idCliente = cl.idCliente WHERE cl.idCliente = 1;
+
 CREATE TABLE Transferencias (
     folio INT PRIMARY KEY,
     numCuentaReceptora INT NOT NULL,
@@ -53,7 +57,7 @@ CREATE TABLE Retiros (
 
 CREATE TABLE RetirosSinCuenta (
     folio INT PRIMARY KEY,
-    contrasenia INT NOT NULL,
+    contrasenia VARBINARY(255),
     estado ENUM('Pendiente', 'Cobrado', 'No cobrado'),
     fechaHoraCobro DATETIME,
     FOREIGN KEY (folio) REFERENCES Operaciones (folio)
@@ -64,27 +68,122 @@ CREATE TABLE Depositos (
     FOREIGN KEY (folio) REFERENCES Operaciones (folio)
 );
 
-CREATE VIEW todasOperaciones AS
-SELECT o.folio, o.tipo, o.monto, o.fechaHoraEjec, o.numCuentaEmisora, t.numCuentaReceptora,
-rsc.contrasenia, rsc.fechaHoraCobro 
-FROM Operaciones o
-LEFT JOIN Transferencias t on o.folio = t.folio
-LEFT JOIN Retiros r on o.folio = r.folio
-LEFT JOIN RetirosSinCuenta rsc on o.folio = rsc.folio
-LEFT JOIN Depositos d on o.folio = d.folio;
+-- TRIGGER
+DELIMITER //
+CREATE TRIGGER insertarRetiroSinCuenta
+BEFORE INSERT ON RetirosSinCuenta
+FOR EACH ROW
+BEGIN
+    DECLARE contra VARCHAR(8);
+    CALL spGenerarContraseniaRSC(contra);
+    SET NEW.contrasenia = AES_ENCRYPT(contra, 'pipucatepipucate');
+END; //
+
+DELIMITER ;
+
+-- STORED PROCEDURE
+DELIMITER //
+CREATE PROCEDURE spGenerarContraseniaRSC(OUT contra VARCHAR(8))
+BEGIN
+	SET contra = CONCAT(FLOOR(RAND() * 10),
+						 FLOOR(RAND() * 10),
+                         FLOOR(RAND() * 10),
+                         FLOOR(RAND() * 10),
+                         FLOOR(RAND() * 10),
+                         FLOOR(RAND() * 10),
+                         FLOOR(RAND() * 10),
+                         FLOOR(RAND() * 10));
+END; //
+DELIMITER ;
+
+-- STORED PROCEDURE y TRANSACCIÓN
+DELIMITER //
+CREATE PROCEDURE spTransferencia (IN numCuentaOrigen INT, IN numCuentaDestino INT, IN monto DECIMAL(15, 2))
+BEGIN
+	-- Se declara una variable llamada saldoActual.
+    DECLARE saldoActual DECIMAL(15, 2);
+    DECLARE mensaje VARCHAR(255);
+	
+    START TRANSACTION;
+    
+    SET autocommit = 0;
+        
+	-- Se verifica que existan los números de cuenta.
+	IF (numCuentaOrigen NOT IN(SELECT numCuenta FROM Cuentas WHERE estaEliminado = 0)
+		AND
+        numCuentaDestino NOT IN(SELECT numCuenta FROM Cuentas WHERE estaEliminado = 0)
+        ) THEN
+		SET mensaje = 'Ninguna de las cuentas existe.';
+	ELSEIF (numCuentaOrigen NOT IN(SELECT numCuenta FROM Cuentas WHERE estaEliminado = 0)) THEN
+		SET mensaje = 'La cuenta origen no existe.';
+	ELSEIF (numCuentaDestino NOT IN(SELECT numCuenta FROM Cuentas WHERE estaEliminado = 0)) THEN
+		SET mensaje = 'La cuenta destino no existe.';
+	END IF;
+    
+     -- Se obtiene el saldo actual de la cuenta y se guarda en la variable saldoActual
+    SELECT saldo INTO saldoActual FROM Cuentas WHERE numCuenta = numCuentaOrigen;
+    
+    IF monto > saldoActual THEN
+		SET mensaje = 'No cuentas con los fondos suficientes.';
+    END IF;
+    
+	UPDATE Cuentas SET saldo = saldo - monto WHERE numCuenta = numCuentaOrigen;
+    UPDATE Cuentas SET saldo = saldo + monto WHERE numCuenta = numCuentaDestino;
+    
+    -- Mostrar mensaje después del COMMIT
+    IF mensaje IS NOT NULL THEN
+        SELECT mensaje AS Mensaje;
+        ROLLBACK;
+	ELSE
+		COMMIT;
+    END IF;
+END; //
+DELIMITER ;
+
+-- FAVOR DE EJECUTAR ESTA INSTRUCCIÓN PARA QUE LOS RETIROS SIN CUENTA ACTUALICEN SU ESTADO
+SET GLOBAL event_scheduler = ON;
+
+DELIMITER //
+CREATE EVENT actualizarEstadoRetiros
+ON SCHEDULE EVERY 10 SECOND -- Cambiar a la frecuencia deseada, por ejemplo, cada minuto
+DO
+BEGIN
+    -- Actualizar el estado de las operaciones pendientes que han pasado más de 10 minutos
+    UPDATE RetirosSinCuenta r
+    INNER JOIN Operaciones o ON r.folio = o.folio
+    SET r.estado = 'No cobrado'
+    WHERE r.estado = 'Pendiente' 
+    AND TIMESTAMPDIFF(MINUTE, o.fechaHoraEjec, NOW()) >= 10;
+END; //
+DELIMITER ;
+
+SELECT o.folio, o.tipo, o.monto, o.fechaHoraEjec,
+o.numCuentaEmisora, t.numCuentaReceptora,
+rsc.contrasenia, rsc.fechaHoraCobro  FROM Operaciones o
+LEFT JOIN Transferencias t ON o.folio = t.folio
+LEFT JOIN Retiros r ON o.folio = r.folio
+LEFT JOIN RetirosSinCuenta rsc ON o.folio = rsc.folio
+LEFT JOIN Depositos d ON o.folio = d.folio
+INNER JOIN Cuentas cu on o.numCuentaEmisora = numCuenta
+INNER JOIN Clientes cl on cu.idCliente = cl.idCliente
+WHERE cl.idCliente = 1;
+
+select * from todasOperaciones;
 
 -- Inserts para la tabla Clientes
 INSERT INTO Clientes (nombres, apellidoPaterno, apellidoMaterno, fechaNacimiento, correo, contrasenia) VALUES
-('Juan', 'Perez', 'Gonzalez', '1990-05-15', 'a@a.com', sha2('a', 512)),
-('Maria', 'Lopez', 'Martinez', '1988-10-25', 'b@b.com', sha2('a', 512)),
-('Pedro', 'Garcia', 'Sanchez', '1975-03-08', 'c@c.com', sha2('a', 512)),
-('Ana', 'Martinez', 'Gomez', '1982-07-12', 'd@d.com', sha2('a', 512)),
-('Sofia', 'Hernandez', 'Rodriguez', '1995-11-30', 'e@e.com', sha2('a', 512)),
-('Luis', 'Torres', 'Diaz', '1978-09-18', 'f@f.com', sha2('a', 512)),
-('Fernanda', 'Diaz', 'Ruiz', '1989-04-03', 'g@g.com', sha2('a', 512)),
-('Carlos', 'Sanchez', 'Perez', '1992-12-20', 'h@h.com', sha2('a', 512)),
-('Alejandra', 'Gomez', 'Luna', '1980-08-15', 'i@i.com', sha2('a', 512)),
-('Javier', 'Gutierrez', 'Fernandez', '1973-06-28', 'j@j.com', sha2('a', 512));
+('Juan', 'Perez', 'Gonzalez', '1990-05-15', 'a', AES_ENCRYPT('a', 'pipucatepipucate')),
+('Maria', 'Lopez', 'Martinez', '1988-10-25', 'b@b.com', AES_ENCRYPT('b', 'pipucatepipucate')),
+('Pedro', 'Garcia', 'Sanchez', '1975-03-08', 'c@c.com', AES_ENCRYPT('c', 'pipucatepipucate')),
+('Ana', 'Martinez', 'Gomez', '1982-07-12', 'd@d.com', AES_ENCRYPT('d', 'pipucatepipucate')),
+('Sofia', 'Hernandez', 'Rodriguez', '1995-11-30', 'e@e.com', AES_ENCRYPT('e', 'pipucatepipucate')),
+('Luis', 'Torres', 'Diaz', '1978-09-18', 'f@f.com', AES_ENCRYPT('f', 'pipucatepipucate')),
+('Fernanda', 'Diaz', 'Ruiz', '1989-04-03', 'g@g.com', AES_ENCRYPT('g', 'pipucatepipucate')),
+('Carlos', 'Sanchez', 'Perez', '1992-12-20', 'h@h.com', AES_ENCRYPT('h', 'pipucatepipucate')),
+('Alejandra', 'Gomez', 'Luna', '1980-08-15', 'i@i.com', AES_ENCRYPT('i', 'pipucatepipucate')),
+('Javier', 'Gutierrez', 'Fernandez', '1973-06-28', 'j@j.com', AES_ENCRYPT('j', 'pipucatepipucate'));
+
+select * from clientes where contrasenia = AES_ENCRYPT('ff', 'pipucatepipucate');
 
 -- Inserts para la tabla Direcciones
 INSERT INTO Direcciones (codigoPostal, colonia, calle, numExterior, idCliente) VALUES
@@ -174,14 +273,14 @@ INSERT INTO Retiros  VALUES
 (30);
 
 -- Inserts para la tabla RetirosSinCuenta
-INSERT INTO RetirosSinCuenta VALUES
-(3, 84072651, 'Pendiente', null),
-(7, 30518729, 'No cobrado', null),
-(11, 61930472, 'Cobrado', now()),
-(15, 92810634, 'No cobrado', null),
-(19, 20387456, 'Pendiente', null),
-(23, 74501928, 'Cobrado', now()),
-(27, 51263789, 'Pendiente', null);
+INSERT INTO RetirosSinCuenta (folio, estado, fechaHoraCobro) VALUES
+(3, 'Pendiente', null),
+(7, 'No cobrado', null),
+(11, 'Cobrado', now()),
+(15, 'No cobrado', null),
+(19, 'Pendiente', null),
+(23, 'Cobrado', now()),
+(27, 'Pendiente', null);
 
 INSERT INTO Depositos  VALUES
 (4),

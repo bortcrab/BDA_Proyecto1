@@ -4,14 +4,14 @@
  */
 package negocio;
 
-import dtos.Datos;
 import dtos.OperacionDTO;
-import dtos.Usuario;
 import entidades.OperacionEntidad;
 import java.util.ArrayList;
+import java.sql.Date;
 import java.util.List;
 import persistencia.IOperacionDAO;
 import persistencia.PersistenciaException;
+import utilerias.Utilidades;
 
 /**
  *
@@ -25,13 +25,20 @@ public class OperacionNegocio implements IOperacionNegocio {
     }
 
     @Override
-    public List<OperacionDTO> buscarOperacionesTabla(int idCliente) throws NegocioException {
+    public List<OperacionDTO> buscarOperacionesTabla(int idCliente, String filtroTipo, Date inicio, Date fin, int pagina, int limite) throws NegocioException {
         try {
-            List<OperacionEntidad> operacionesEntidadesLista = operacionDAO.buscarOperacionesTabla(idCliente);
-            List<OperacionDTO> operacionesLista = convertirListaOperacionEntidad_DTO(operacionesEntidadesLista);
-            if (operacionesLista == null) {
+            if (limite < 0) {
+                throw new NegocioException("El parámetro límite no puede ser negativo.");
+            }
+            if (pagina < 0) {
+                throw new NegocioException("El parámetro página no puede ser negativo.");
+            }
+            int offset = obtenerOFFSETMySQL(limite, pagina);
+            List<OperacionEntidad> operacionesEntidadesLista = operacionDAO.buscarOperacionesTabla(idCliente, filtroTipo, inicio, fin, limite, offset);
+            if (operacionesEntidadesLista == null) {
                 throw new NegocioException("No ha realizado ninguna operación.");
             }
+            List<OperacionDTO> operacionesLista = convertirListaOperacionEntidad_DTO(operacionesEntidadesLista);
 
             return operacionesLista;
         } catch (PersistenciaException pe) {
@@ -44,15 +51,22 @@ public class OperacionNegocio implements IOperacionNegocio {
     public List<OperacionDTO> convertirListaOperacionEntidad_DTO(List<OperacionEntidad> operacionesEntidadesLista) {
         List<OperacionDTO> operacionesDTOLista = new ArrayList<>();
         for (OperacionEntidad operacionEntidad : operacionesEntidadesLista) {
-            OperacionDTO operacionDTO = new OperacionDTO(operacionEntidad.getFolio(), String.valueOf(operacionEntidad.getMonto()), operacionEntidad.getTipo(), operacionEntidad.getFechaHoraEjec().toString(), operacionEntidad.getNumCuentaEmisora());
+            OperacionDTO operacionDTO = convertirOperacionesTabla(operacionEntidad);
             operacionesDTOLista.add(operacionDTO);
         }
         return operacionesDTOLista;
     }
     
-    public OperacionDTO convertirOperacionEntidad_DTO(OperacionEntidad operacionEntidad) {
-        OperacionDTO operacionDTO = new OperacionDTO(operacionEntidad.getFolio(), String.valueOf(operacionEntidad.getMonto()),
-                operacionEntidad.getTipo(), operacionEntidad.getFechaHoraEjec().toString(), operacionEntidad.getNumCuentaEmisora());
+    public OperacionDTO convertirOperacionesTabla(OperacionEntidad operacionEntidad) {
+        OperacionDTO operacionDTO = new OperacionDTO(
+                operacionEntidad.getFolio(),
+                String.valueOf(operacionEntidad.getMonto()),
+                operacionEntidad.getTipo(),
+                operacionEntidad.getFechaHoraEjec().toString(),
+                operacionEntidad.getNumCuentaEmisora(),
+                operacionEntidad.getNumCuentaReceptora(),
+                operacionEntidad.getEstado(),
+                operacionEntidad.getFechaHoraCobro());
         return operacionDTO;
     }
 
@@ -69,9 +83,58 @@ public class OperacionNegocio implements IOperacionNegocio {
         }
     }
     
+    public OperacionDTO convertirOperacionEntidad_DTO(OperacionEntidad operacionEntidad) {
+        OperacionDTO operacionDTO = new OperacionDTO(
+                operacionEntidad.getFolio(),
+                String.valueOf(operacionEntidad.getMonto()),
+                operacionEntidad.getTipo(),
+                operacionEntidad.getNumCuentaEmisora());
+        return operacionDTO;
+    }
+    
     public OperacionEntidad convertirOperacionDTO_Entidad(OperacionDTO operacionDTO) {
-        OperacionEntidad operacionEntidad = new OperacionEntidad(operacionDTO.getFolio(), Float.parseFloat(operacionDTO.getMonto()),
-                operacionDTO.getTipo(), java.sql.Date.valueOf(operacionDTO.getFechaHora()), operacionDTO.getNumCuentaOrigen());
+        OperacionEntidad operacionEntidad = new OperacionEntidad(
+                Float.parseFloat(operacionDTO.getMonto()),
+                operacionDTO.getTipo(),
+                operacionDTO.getNumCuentaOrigen(),
+                operacionDTO.getNumCuentaDestino());
         return operacionEntidad;
+    }
+
+    @Override
+    public String obtenerContrasenia(int folio) throws NegocioException {
+        try {
+            String contrasenia = operacionDAO.obtenerContrasenia(folio);
+            return contrasenia;
+        } catch (PersistenciaException pe) {
+            System.out.println(pe.getMessage());
+            throw new NegocioException(pe.getMessage());
+        }
+    }
+    
+    @Override
+    public OperacionDTO obtenerOperacion(int folio) throws NegocioException {
+        try {
+            OperacionEntidad operacionEntidad = operacionDAO.obtenerOperacion(folio);
+            OperacionDTO operacionDTO = convertirOperacionEntidad_DTO(operacionEntidad);
+            return operacionDTO;
+        } catch (PersistenciaException pe) {
+            System.out.println(pe.getMessage());
+            throw new NegocioException(pe.getMessage());
+        }
+    }
+
+    @Override
+    public void actualizarRetiroSinCuenta(int folio) throws NegocioException {
+        try {
+            operacionDAO.actualizarRetiroSinCuenta(folio);
+        } catch (PersistenciaException pe) {
+            System.out.println(pe.getMessage());
+            throw new NegocioException(pe.getMessage());
+        }
+    }
+    
+    private int obtenerOFFSETMySQL(int limit, int pagina) {
+        return new Utilidades().RegresarOFFSETMySQL(limit, pagina);
     }
 }

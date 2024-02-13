@@ -11,6 +11,8 @@ import static enumeradores.AccionCatalogoEnumerador.*;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import persistencia.ICuentaDAO;
 import persistencia.PersistenciaException;
 
@@ -56,9 +58,18 @@ public class CuentaNegocio implements ICuentaNegocio {
     public CuentaDTO buscarCuenta(int numCuenta) throws NegocioException {
         try {
             CuentaEntidad cuentaEntidad = cuentaDAO.buscarCuenta(numCuenta);
-            if (cuentaEntidad == null) {
-                throw new NegocioException("No se encontró la cuenta con esa ID.");
-            }
+            CuentaDTO cuentaDTO = convertirCuentaEntidad_DTO(cuentaEntidad);
+            return cuentaDTO;
+        } catch (PersistenciaException pe) {
+            System.out.println(pe.getMessage());
+            throw new NegocioException(pe.getMessage());
+        }
+    }
+    
+    @Override
+    public CuentaDTO buscarCuenta(int folio, String contrasenia) throws NegocioException {
+        try {
+            CuentaEntidad cuentaEntidad = cuentaDAO.buscarCuenta(folio, contrasenia);
             CuentaDTO cuentaDTO = convertirCuentaEntidad_DTO(cuentaEntidad);
             return cuentaDTO;
         } catch (PersistenciaException pe) {
@@ -108,6 +119,37 @@ public class CuentaNegocio implements ICuentaNegocio {
             cuentaDAO.borrar(cuentaEntidad);
         } catch (PersistenciaException pe) {
             System.out.println(pe.getMessage());
+            throw new NegocioException(pe.getMessage());
+        }
+    }
+
+    @Override
+    public void transferir(int numCuentaOrigen, int numCuentaDestino, float monto) throws NegocioException {
+        CuentaDTO cuentaOrigenDTO;
+        CuentaDTO cuentaDestinoDTO;
+        try {
+            cuentaOrigenDTO = buscarCuenta(numCuentaOrigen);
+        } catch (NegocioException pe) {
+            throw new NegocioException("La cuenta de origen no existe.");
+        }
+        
+        try {
+            cuentaDestinoDTO = buscarCuenta(numCuentaDestino);
+        } catch (NegocioException pe) {
+            throw new NegocioException("La cuenta de destino no existe.");
+        }
+        
+        if (cuentaOrigenDTO.getIdCliente() == cuentaDestinoDTO.getIdCliente()) {
+            throw new NegocioException("La cuenta de origen y destino no pueden ser las mismas.");
+        }
+        
+        if (monto > Float.parseFloat(cuentaOrigenDTO.getSaldo())) {
+            throw new NegocioException("No cuenta con los fondos suficientes para realizar la transferencia.");
+        }
+        
+        try {
+            cuentaDAO.transferir(numCuentaOrigen, numCuentaDestino, monto);
+        } catch (PersistenciaException pe) {
             throw new NegocioException(pe.getMessage());
         }
     }

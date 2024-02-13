@@ -17,9 +17,13 @@ public interface ICuentaNegocio {
     
     public CuentaDTO buscarCuenta(int numCuenta) throws NegocioException;
     
+    public CuentaDTO buscarCuenta(int folio, String contrasenia) throws NegocioException;
+    
     public CuentaDTO guardar(CuentaDTO cuentaDTO) throws NegocioException;
     
     public void editar(CuentaDTO cuentaDTO, AccionCatalogoEnumerador accion) throws NegocioException;
     
     public void borrar(CuentaDTO cuentaDTO) throws NegocioException;
+    
+    public void transferir(int numCuentaOrigen, int numCuentaDestino, float monto) throws NegocioException;
 }

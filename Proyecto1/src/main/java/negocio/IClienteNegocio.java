@@ -9,4 +9,6 @@ public interface IClienteNegocio {
     public ClienteDTO guardar(ClienteDTO clienteDTO) throws NegocioException;
 
     public void editar(ClienteDTO clienteDTO) throws NegocioException;
+    
+    public String obtenerContrasenia(int idCliente) throws NegocioException;
 }

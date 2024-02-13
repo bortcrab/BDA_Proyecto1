@@ -7,6 +7,7 @@ package persistencia;
 import entidades.CuentaEntidad;
 import enumeradores.AccionCatalogoEnumerador;
 import static enumeradores.AccionCatalogoEnumerador.*;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -65,6 +66,8 @@ public class CuentaDAO implements ICuentaDAO {
             ResultSet resultado = comandoSQL.executeQuery(codigoSQL);
             if (resultado.next()) {
                 cuentaEntidad = convertirResultado(resultado);
+            } else {
+                throw new PersistenciaException("No se encontró la cuenta.");
             }
             logger.log(Level.INFO, "Se obtuvieron los datos del cliente: " + cuentaEntidad.getIdCliente());
             return cuentaEntidad;
@@ -75,6 +78,29 @@ public class CuentaDAO implements ICuentaDAO {
         }
     }
     
+    @Override
+    public CuentaEntidad buscarCuenta(int folio, String contrasenia) throws PersistenciaException {
+        CuentaEntidad cuentaEntidad = new CuentaEntidad();
+        try (Connection conexion = this.conexionBD.crearConexion()) {
+            String codigoSQL = "SELECT c.* FROM Cuentas c "
+                             + "INNER JOIN Operaciones o ON c.numCuenta = o.numCuentaEmisora "
+                             + "WHERE o.folio = " + folio + " AND c.estaEliminado = 0;";
+            Statement comandoSQL = conexion.createStatement();
+            ResultSet resultado = comandoSQL.executeQuery(codigoSQL);
+            if (resultado.next()) {
+                cuentaEntidad = convertirResultado(resultado);
+            } else {
+                throw new PersistenciaException("No se encontró la cuenta.");
+            }
+            logger.log(Level.INFO, "Se obtuvieron los datos del cliente: " + cuentaEntidad.getIdCliente());
+            return cuentaEntidad;
+        } catch (SQLException sqle) {
+            // Hacer uso de Logger
+            logger.log(Level.SEVERE, "Ocurrió un error al obtener los datos del cliente.", sqle);
+            throw new PersistenciaException("Ocurrió un error al leer la base de datos, inténtelo de nuevo y si el error persiste comuníquese con el encargado del sistema.");
+        }
+    }
+
     public CuentaEntidad convertirResultado(ResultSet resultado) throws SQLException {
         CuentaEntidad cuentaEntidad = new CuentaEntidad();
         cuentaEntidad.setNumCuenta(resultado.getInt("numCuenta"));
@@ -84,7 +110,7 @@ public class CuentaDAO implements ICuentaDAO {
         cuentaEntidad.setIdCliente(resultado.getInt("idCliente"));
         return cuentaEntidad;
     }
-    
+
     @Override
     public CuentaEntidad guardar(CuentaEntidad cuentaEntidad) throws PersistenciaException {
         try (Connection conexion = conexionBD.crearConexion()) {
@@ -143,11 +169,11 @@ public class CuentaDAO implements ICuentaDAO {
                 throw new PersistenciaException("Ocurrió un error al eliminar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
             }
         } catch (SQLException sqle) {
-           // hacer uso de Logger
+            // hacer uso de Logger
             throw new PersistenciaException("Ocurrió un error al registrar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
         }
     }
-    
+
     private void editarCuenta(CuentaEntidad cuentaEntidad, Connection conexion, AccionCatalogoEnumerador accion) throws SQLException {
         String updateCuenta;
         if (accion == DEPOSITO) {
@@ -160,6 +186,8 @@ public class CuentaDAO implements ICuentaDAO {
             preparedStatement.setInt(2, cuentaEntidad.getNumCuenta());
             // Ejecutar la actualización
             preparedStatement.executeUpdate();
+        } catch (SQLException sqle) {
+            throw new SQLException(sqle.getMessage());
         }
     }
 
@@ -180,11 +208,11 @@ public class CuentaDAO implements ICuentaDAO {
                 throw new PersistenciaException("Ocurrió un error al eliminar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
             }
         } catch (SQLException sqle) {
-           // hacer uso de Logger
+            // hacer uso de Logger
             throw new PersistenciaException("Ocurrió un error al registrar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
         }
     }
-    
+
     private void borrarCuenta(CuentaEntidad cuentaEntidad, Connection conexion) throws SQLException {
         String deleteCuenta = "UPDATE Cuentas set estaEliminado = ? WHERE numCuenta = ?;";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(deleteCuenta)) {
@@ -192,6 +220,40 @@ public class CuentaDAO implements ICuentaDAO {
             preparedStatement.setInt(2, cuentaEntidad.getNumCuenta());
             // Ejecutar la actualización
             preparedStatement.executeUpdate();
+        } catch (SQLException sqle) {
+            throw new SQLException(sqle.getMessage());
+        }
+    }
+
+    @Override
+    public void transferir(int numCuentaOrigen, int numCuentaDestino, float monto) throws PersistenciaException {
+        try (Connection conexion = this.conexionBD.crearConexion()) {
+            try {
+                // Actualizar el cliente
+                realizarTransferencia(numCuentaOrigen, numCuentaDestino, monto, conexion);
+                logger.log(Level.INFO, "Se eliminó un cliente de la tabla.");
+            } catch (SQLException sqle) {
+                // hacer uso de Logger
+                throw new PersistenciaException(sqle.getMessage());
+            }
+        } catch (SQLException sqle) {
+            // hacer uso de Logger
+            throw new PersistenciaException("Ocurrió un error al registrar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
+        }
+    }
+
+    private void realizarTransferencia(int numCuentaOrigen, int numCuentaDestino, float monto, Connection conexion) throws SQLException {
+        //Preparar la llamada al stored procedure
+        String spTransferencia = "{call spTransferencia(?, ?, ?)}";
+        try (CallableStatement callableStatement = conexion.prepareCall(spTransferencia)) {
+            //Configurar los parámetros del stored procedure
+            callableStatement.setInt(1, numCuentaOrigen);
+            callableStatement.setInt(2, numCuentaDestino);
+            callableStatement.setFloat(3, monto);
+
+            callableStatement.executeUpdate();
+        } catch (SQLException sqle) {
+            throw new SQLException(sqle.getMessage());
         }
     }
 }

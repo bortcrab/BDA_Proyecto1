@@ -222,7 +222,7 @@ public class FrmMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCancelarCuentaActionPerformed
 
     private void btnDepositarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDepositarActionPerformed
-        FrmEditarCuenta frmEditarCuenta = new FrmEditarCuenta(datos, usuario, DEPOSITO);
+        FrmDepositoRetiro frmEditarCuenta = new FrmDepositoRetiro(datos, usuario, DEPOSITO);
         frmEditarCuenta.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnDepositarActionPerformed
@@ -234,7 +234,7 @@ public class FrmMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_btnRetiroSinCuentaActionPerformed
 
     private void btnRetiroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetiroActionPerformed
-        FrmEditarCuenta frmEditarCuenta = new FrmEditarCuenta(datos, usuario, RETIRO);
+        FrmDepositoRetiro frmEditarCuenta = new FrmDepositoRetiro(datos, usuario, RETIRO);
         frmEditarCuenta.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnRetiroActionPerformed

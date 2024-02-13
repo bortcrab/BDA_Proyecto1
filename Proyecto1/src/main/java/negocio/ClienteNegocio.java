@@ -79,4 +79,15 @@ public class ClienteNegocio implements IClienteNegocio {
     private int obtenerOFFSETMySQL(int limit, int pagina) {
         return new Utilidades().RegresarOFFSETMySQL(limit, pagina);
     }
+
+    @Override
+    public String obtenerContrasenia(int idCliente) throws NegocioException {
+        try {
+            String contrasenia = clienteDAO.obtenerContrasenia(idCliente);
+            return contrasenia;
+        } catch (PersistenciaException pe) {
+            System.out.println(pe.getMessage());
+            throw new NegocioException(pe.getMessage());
+        }
+    }
 }

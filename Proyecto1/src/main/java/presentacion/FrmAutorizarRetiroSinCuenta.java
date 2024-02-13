@@ -4,16 +4,38 @@
  */
 package presentacion;
 
+import dtos.CuentaDTO;
 import dtos.Datos;
+import dtos.OperacionDTO;
 import dtos.Usuario;
+import java.text.NumberFormat;
+import java.util.Base64;
+import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.crypto.Cipher;
+import static javax.crypto.Cipher.SECRET_KEY;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import javax.swing.DefaultComboBoxModel;
+import negocio.ICuentaNegocio;
+import negocio.IOperacionNegocio;
+import negocio.NegocioException;
 
 /**
  *
  * @author jorge
  */
+
 public class FrmAutorizarRetiroSinCuenta extends javax.swing.JFrame {
-    Datos datos;
-    Usuario usuario;
+    private Datos datos;
+    private Usuario usuario;
+    private ICuentaNegocio cuentaNegocio;
+    private IOperacionNegocio operacionNegocio;
+    private static final String ALGORITHM = "AES";
+    private static final String SECRET_KEY = "pipucatepipucate"; // Tu clave secreta
+
     
     /**
      * Creates new form FrmAutorizarRetiroSinCuenta
@@ -22,8 +44,32 @@ public class FrmAutorizarRetiroSinCuenta extends javax.swing.JFrame {
         initComponents();
         this.datos = datos;
         this.usuario = usuario;
+        this.operacionNegocio = datos.getOperacionNegocio();
+        this.cuentaNegocio = datos.getCuentaNegocio();
+    obtenerCuentas();
     }
 
+    private void obtenerCuentas() {
+        try {
+            List<CuentaDTO> listaCuentasDTO = cuentaNegocio.obtenerCuentas(usuario.getCliente().getId());
+            DefaultComboBoxModel<CuentaDTO> modelo = new DefaultComboBoxModel<>();
+            for (CuentaDTO cuenta : listaCuentasDTO) {
+                modelo.addElement(cuenta);
+            }
+            comboCuentas.setModel(modelo);
+            CuentaDTO primerElemento = (CuentaDTO) comboCuentas.getSelectedItem();
+            String saldoFormateado = formatearSaldo(Float.parseFloat(primerElemento.getSaldo()));
+            txtSaldo.setText(saldoFormateado);
+        } catch (NegocioException ex) {
+            Logger.getLogger(FrmCancelarCuenta.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private String formatearSaldo(float saldo) {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.US);
+        String saldoFormateado = formatter.format(saldo);
+        return saldoFormateado;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -36,12 +82,18 @@ public class FrmAutorizarRetiroSinCuenta extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        lblFolio = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
+        lblContrasenia = new javax.swing.JLabel();
         btnRevelar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
         lblMensaje = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        txtMonto = new javax.swing.JTextField();
+        comboCuentas = new javax.swing.JComboBox<>();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        txtSaldo = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -54,14 +106,14 @@ public class FrmAutorizarRetiroSinCuenta extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel3.setText("Folio:");
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel4.setText("********");
+        lblFolio.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblFolio.setText("********");
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel5.setText("Contraseña:");
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel6.setText("********");
+        lblContrasenia.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblContrasenia.setText("********");
 
         btnRevelar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnRevelar.setText("Revelar");
@@ -81,43 +133,68 @@ public class FrmAutorizarRetiroSinCuenta extends javax.swing.JFrame {
 
         lblMensaje.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lblMensaje.setForeground(new java.awt.Color(255, 51, 51));
-        lblMensaje.setText("!Recuerda que tienes 10 minutos para retirar el dinero¡");
+        lblMensaje.setText("¡Recuerda que tienes 10 minutos para retirar el dinero!");
+
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel7.setText("Monto:");
+
+        txtMonto.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+
+        comboCuentas.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        comboCuentas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboCuentasActionPerformed(evt);
+            }
+        });
+
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel8.setText("Cuenta:");
+
+        jLabel9.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel9.setText("Saldo:");
+
+        txtSaldo.setEditable(false);
+        txtSaldo.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(37, 37, 37)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnCancelar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnRevelar)
-                        .addGap(37, 37, 37))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel2)
                 .addGap(70, 70, 70))
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(0, 16, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(16, 16, 16)
-                        .addComponent(lblMensaje))
+                        .addComponent(btnCancelar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnRevelar))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(62, 62, 62)
-                        .addComponent(jLabel1)))
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblContrasenia, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblFolio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel7)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtMonto))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(46, 46, 46)
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel8)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(comboCuentas, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(lblMensaje)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtSaldo)))
                 .addContainerGap(16, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -129,19 +206,31 @@ public class FrmAutorizarRetiroSinCuenta extends javax.swing.JFrame {
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblMensaje)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel8)
+                    .addComponent(comboCuentas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(txtSaldo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(txtMonto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jLabel4))
+                    .addComponent(lblFolio))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(jLabel6))
+                    .addComponent(lblContrasenia))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCancelar)
                     .addComponent(btnRevelar))
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         pack();
@@ -149,14 +238,51 @@ public class FrmAutorizarRetiroSinCuenta extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRevelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRevelarActionPerformed
-        btnRevelar.setEnabled(false);
+        try {
+            CuentaDTO cuentaDTO = (CuentaDTO) comboCuentas.getSelectedItem();
+
+            OperacionDTO operacionDTO = new OperacionDTO();
+            operacionDTO.setMonto(txtMonto.getText());
+            operacionDTO.setTipo("Retiro sin cuenta");
+            operacionDTO.setNumCuentaOrigen(cuentaDTO.getNumCuenta());
+            operacionDTO.setNumCuentaDestino(0);
+
+            operacionDTO = operacionNegocio.guardar(operacionDTO);
+            String contrasenia = String.valueOf(operacionNegocio.obtenerContrasenia(operacionDTO.getFolio()));
+            lblFolio.setText(String.valueOf(operacionDTO.getFolio()));
+            lblContrasenia.setText(contrasenia);
+            btnRevelar.setEnabled(false);
+            btnCancelar.setText("Volver");
+        } catch (NegocioException ex) {
+            Logger.getLogger(FrmAutorizarRetiroSinCuenta.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(FrmAutorizarRetiroSinCuenta.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnRevelarActionPerformed
 
+//    public static String decrypt(String ciphertext) throws Exception {
+//        try {
+//            SecretKey originalKey = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
+//            Cipher cipher = Cipher.getInstance(ALGORITHM);
+//            cipher.init(Cipher.DECRYPT_MODE, originalKey);
+//            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(ciphertext));
+//            return new String(decryptedBytes);
+//        } catch (Exception e) {
+//            throw new Exception("Error al desencriptar el texto: " + e.getMessage());
+//        }
+//    }
+    
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         FrmMenu frmMenu = new FrmMenu(datos, usuario);
         frmMenu.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
+
+    private void comboCuentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboCuentasActionPerformed
+        CuentaDTO cuentaDTO = (CuentaDTO) comboCuentas.getSelectedItem();
+        String saldoFormateado = formatearSaldo(Float.parseFloat(cuentaDTO.getSaldo()));
+        txtSaldo.setText(saldoFormateado);
+    }//GEN-LAST:event_comboCuentasActionPerformed
 
 //    /**
 //     * @param args the command line arguments
@@ -196,12 +322,18 @@ public class FrmAutorizarRetiroSinCuenta extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnRevelar;
+    private javax.swing.JComboBox<CuentaDTO> comboCuentas;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel lblContrasenia;
+    private javax.swing.JLabel lblFolio;
     private javax.swing.JLabel lblMensaje;
+    private javax.swing.JTextField txtMonto;
+    private javax.swing.JTextField txtSaldo;
     // End of variables declaration//GEN-END:variables
 }

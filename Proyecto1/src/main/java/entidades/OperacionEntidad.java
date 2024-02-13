@@ -1,6 +1,7 @@
 package entidades;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -10,35 +11,40 @@ public class OperacionEntidad {
     private int folio;
     private float monto;
     private String tipo;
-    private Date fechaHoraEjec;
+    private Timestamp fechaHoraEjec;
     private int numCuentaEmisora;
+    private int numCuentaReceptora;
+    private String estado;
+    private Timestamp fechaHoraCobro;
 
     public OperacionEntidad() {
         
     }
-    
-    public OperacionEntidad(int folio, float monto, String tipo, Date fechaHoraEjec, int numCuentaEmisora) {
+
+    public OperacionEntidad(int folio, float monto, String tipo, Timestamp fechaHoraEjec, int numCuentaEmisora, int numCuentaReceptora, String estado, Timestamp fechaHoraCobro) {
         this.folio = folio;
-        this.tipo = tipo;
         this.monto = monto;
+        this.tipo = tipo;
         this.fechaHoraEjec = fechaHoraEjec;
         this.numCuentaEmisora = numCuentaEmisora;
+        this.numCuentaReceptora = numCuentaReceptora;
+        this.estado = estado;
+        this.fechaHoraCobro = fechaHoraCobro;
     }
 
+    public OperacionEntidad(float monto, String tipo, int numCuentaEmisora, int numCuentaReceptora) {
+        this.monto = monto;
+        this.tipo = tipo;
+        this.numCuentaEmisora = numCuentaEmisora;
+        this.numCuentaReceptora = numCuentaReceptora;
+    }
+    
     public int getFolio() {
         return folio;
     }
 
     public void setFolio(int folio) {
         this.folio = folio;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
     }
 
     public float getMonto() {
@@ -49,11 +55,19 @@ public class OperacionEntidad {
         this.monto = monto;
     }
 
-    public Date getFechaHoraEjec() {
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public Timestamp getFechaHoraEjec() {
         return fechaHoraEjec;
     }
 
-    public void setFechaHoraEjec(Date fechaHoraEjec) {
+    public void setFechaHoraEjec(Timestamp fechaHoraEjec) {
         this.fechaHoraEjec = fechaHoraEjec;
     }
 
@@ -61,8 +75,32 @@ public class OperacionEntidad {
         return numCuentaEmisora;
     }
 
-    public void setNumCuentaOrigen(int numCuentaEmisora) {
+    public void setNumCuentaEmisora(int numCuentaEmisora) {
         this.numCuentaEmisora = numCuentaEmisora;
+    }
+
+    public int getNumCuentaReceptora() {
+        return numCuentaReceptora;
+    }
+
+    public void setNumCuentaReceptora(int numCuentaReceptora) {
+        this.numCuentaReceptora = numCuentaReceptora;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public Timestamp getFechaHoraCobro() {
+        return fechaHoraCobro;
+    }
+
+    public void setFechaHoraCobro(Timestamp fechaHoraCobro) {
+        this.fechaHoraCobro = fechaHoraCobro;
     }
     
 }

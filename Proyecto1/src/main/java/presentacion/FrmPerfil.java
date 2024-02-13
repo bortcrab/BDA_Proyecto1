@@ -14,9 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import negocio.IClienteNegocio;
-import negocio.ICuentaNegocio;
 import negocio.IDireccionNegocio;
-import negocio.IOperacionNegocio;
 import negocio.NegocioException;
 
 /**

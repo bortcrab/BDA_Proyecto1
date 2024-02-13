@@ -8,17 +8,16 @@ import dtos.CuentaDTO;
 import dtos.Datos;
 import dtos.OperacionDTO;
 import dtos.Usuario;
-import static enumeradores.AccionCatalogoEnumerador.DEPOSITO;
-import static enumeradores.AccionCatalogoEnumerador.RETIRO;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Date;
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import negocio.IClienteNegocio;
 import negocio.ICuentaNegocio;
 import negocio.IOperacionNegocio;
 import negocio.NegocioException;
@@ -31,6 +30,7 @@ public class FrmTransferencia extends javax.swing.JFrame {
 
     Datos datos;
     Usuario usuario;
+    IClienteNegocio clienteNegocio;
     ICuentaNegocio cuentaNegocio;
     IOperacionNegocio operacionNegocio;
 
@@ -41,6 +41,7 @@ public class FrmTransferencia extends javax.swing.JFrame {
         initComponents();
         this.datos = datos;
         this.usuario = usuario;
+        this.clienteNegocio = datos.getClienteNegocio();
         this.cuentaNegocio = datos.getCuentaNegocio();
         this.operacionNegocio = datos.getOperacionNegocio();
 
@@ -55,11 +56,19 @@ public class FrmTransferencia extends javax.swing.JFrame {
                 modelo.addElement(cuenta);
             }
             comboCuentas.setModel(modelo);
+            CuentaDTO primerElemento = (CuentaDTO) comboCuentas.getSelectedItem();
+            String saldoFormateado = formatearSaldo(Float.parseFloat(primerElemento.getSaldo()));
+            txtSaldo.setText(saldoFormateado);
         } catch (NegocioException ex) {
             Logger.getLogger(FrmCancelarCuenta.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    private String formatearSaldo(float saldo) {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.US);
+        String saldoFormateado = formatter.format(saldo);
+        return saldoFormateado;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -81,9 +90,10 @@ public class FrmTransferencia extends javax.swing.JFrame {
         pwdContrasenia = new javax.swing.JPasswordField();
         jLabel6 = new javax.swing.JLabel();
         txtDestino = new javax.swing.JTextField();
+        txtSaldo = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(500, 360));
 
         btnConfirmar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnConfirmar.setText("Confirmar");
@@ -117,6 +127,11 @@ public class FrmTransferencia extends javax.swing.JFrame {
         jLabel2.setText("Monto ($):");
 
         comboCuentas.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        comboCuentas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboCuentasActionPerformed(evt);
+            }
+        });
 
         txtMonto.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
@@ -127,6 +142,12 @@ public class FrmTransferencia extends javax.swing.JFrame {
 
         txtDestino.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         txtDestino.setToolTipText("");
+
+        txtSaldo.setEditable(false);
+        txtSaldo.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel7.setText("Saldo:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -143,6 +164,10 @@ public class FrmTransferencia extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel7)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtSaldo))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -178,6 +203,10 @@ public class FrmTransferencia extends javax.swing.JFrame {
                     .addComponent(comboCuentas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(txtSaldo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
                     .addComponent(txtDestino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
@@ -188,11 +217,11 @@ public class FrmTransferencia extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(pwdContrasenia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCancelar)
                     .addComponent(btnConfirmar))
-                .addGap(25, 25, 25))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         pack();
@@ -200,32 +229,35 @@ public class FrmTransferencia extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmarActionPerformed
-        String contrasenia;
+        String contrasenia = "";
         try {
-            contrasenia = hashContrasenia(pwdContrasenia.getText());
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(FrmAbrirCuenta.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(this, "Error al cifrar la contraseña.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+            contrasenia = clienteNegocio.obtenerContrasenia(usuario.getCliente().getId());
+        } catch (NegocioException ex) {
+            Logger.getLogger(FrmDepositoRetiro.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if (contrasenia.equals(usuario.getCliente().getContra())) {
+
+        if (contrasenia.equals(pwdContrasenia.getText())) {
             try {
                 CuentaDTO cuentaDTO = (CuentaDTO) comboCuentas.getSelectedItem();
-                cuentaDTO.setSaldo(txtMonto.getText());
+                cuentaNegocio.transferir(cuentaDTO.getNumCuenta(), Integer.parseInt(txtDestino.getText()), Float.parseFloat(txtMonto.getText()));
                 
-                OperacionDTO operacionDTO = new OperacionDTO(0, txtMonto.getText(), "Transferencia", new Date(0).toString(), cuentaDTO.getNumCuenta());
+                OperacionDTO operacionDTO = new OperacionDTO();
+                operacionDTO.setMonto(txtMonto.getText());
+                operacionDTO.setTipo("Transferencia");
+                operacionDTO.setNumCuentaOrigen(cuentaDTO.getNumCuenta());
+                operacionDTO.setNumCuentaDestino(Integer.parseInt(txtDestino.getText()));
+                
                 operacionNegocio.guardar(operacionDTO);
-                cuentaDTO = cuentaNegocio.buscarCuenta(cuentaDTO.getNumCuenta());
-                JOptionPane.showMessageDialog(this, "Depósito exitoso.\nNúmero de cuenta: " + cuentaDTO.getNumCuenta()
-                        + "\nSaldo actualizado: " + cuentaDTO.getSaldo(), "¡Éxito!", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Transferencia exitosa.", "¡Éxito!", JOptionPane.INFORMATION_MESSAGE);
                 FrmMenu frmMenu = new FrmMenu(datos, usuario);
                 frmMenu.setVisible(true);
                 dispose();
-            } catch (NegocioException ex) {
-                Logger.getLogger(FrmAbrirCuenta.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NegocioException ne) {
+                //Logger.getLogger(FrmAbrirCuenta.class.getName()).log(Level.SEVERE, null, ne);
+                JOptionPane.showMessageDialog(this, ne.getMessage(), "¡Éxito!", JOptionPane.ERROR_MESSAGE);
             }
         } else {
-            System.out.println("Contraseña errónea.");
+            JOptionPane.showMessageDialog(this, "Contraseña errónea.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnConfirmarActionPerformed
 
@@ -257,6 +289,12 @@ public class FrmTransferencia extends javax.swing.JFrame {
         frmMenu.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
+
+    private void comboCuentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboCuentasActionPerformed
+        CuentaDTO cuentaDTO = (CuentaDTO) comboCuentas.getSelectedItem();
+        String saldoFormateado = formatearSaldo(Float.parseFloat(cuentaDTO.getSaldo()));
+        txtSaldo.setText(saldoFormateado);
+    }//GEN-LAST:event_comboCuentasActionPerformed
 
 //    /**
 //     * @param args the command line arguments
@@ -310,8 +348,10 @@ public class FrmTransferencia extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPasswordField pwdContrasenia;
     private javax.swing.JTextField txtDestino;
     private javax.swing.JTextField txtMonto;
+    private javax.swing.JTextField txtSaldo;
     // End of variables declaration//GEN-END:variables
 }
