@@ -1,6 +1,7 @@
 CREATE DATABASE proyecto1;
 USE proyecto1;
 
+-- Creación de tablas
 CREATE TABLE Clientes (
     idCliente INT AUTO_INCREMENT PRIMARY KEY,
     nombres VARCHAR(50) NOT NULL,
@@ -40,10 +41,6 @@ CREATE TABLE Operaciones (
     FOREIGN KEY (numCuentaEmisora) REFERENCES Cuentas (numCuenta)
 );
 
-select * from operaciones where fechaHoraEjec between '2024-02-12' AND '2024-02-18';
-
-SELECT o.folio, o.monto, o.tipo, o.fechaHoraEjec,o.numCuentaEmisora, t.numCuentaReceptora,rsc.contrasenia, rsc.fechaHoraCobro  FROM Operaciones o LEFT JOIN Transferencias t ON o.folio = t.folioLEFT JOIN Retiros r ON o.folio = r.folioLEFT JOIN RetirosSinCuenta rsc ON o.folio = rsc.folioLEFT JOIN Depositos d ON o.folio = d.folioINNER JOIN Cuentas cu on o.numCuentaEmisora = cu.numCuentaINNER JOIN Clientes cl on cu.idCliente = cl.idCliente WHERE cl.idCliente = 1;
-
 CREATE TABLE Transferencias (
     folio INT PRIMARY KEY,
     numCuentaReceptora INT NOT NULL,
@@ -68,7 +65,8 @@ CREATE TABLE Depositos (
     FOREIGN KEY (folio) REFERENCES Operaciones (folio)
 );
 
--- TRIGGER
+
+-- TRIGGER PARA GUARDAR LA CONTRASEÑA DEL RETIRO SIN CUENTA
 DELIMITER //
 CREATE TRIGGER insertarRetiroSinCuenta
 BEFORE INSERT ON RetirosSinCuenta
@@ -81,7 +79,8 @@ END; //
 
 DELIMITER ;
 
--- STORED PROCEDURE
+
+-- STORED PROCEDURE PARA GENERAR UNA CONTRASEÑA DE 8 DÍGITOS.
 DELIMITER //
 CREATE PROCEDURE spGenerarContraseniaRSC(OUT contra VARCHAR(8))
 BEGIN
@@ -96,11 +95,11 @@ BEGIN
 END; //
 DELIMITER ;
 
--- STORED PROCEDURE y TRANSACCIÓN
+
+-- STORED PROCEDURE y TRANSACCIÓN PARA LLEVAR A CABO LAS TRANSFERENCIAS
 DELIMITER //
 CREATE PROCEDURE spTransferencia (IN numCuentaOrigen INT, IN numCuentaDestino INT, IN monto DECIMAL(15, 2))
 BEGIN
-	-- Se declara una variable llamada saldoActual.
     DECLARE saldoActual DECIMAL(15, 2);
     DECLARE mensaje VARCHAR(255);
 	
@@ -140,9 +139,13 @@ BEGIN
 END; //
 DELIMITER ;
 
+
 -- FAVOR DE EJECUTAR ESTA INSTRUCCIÓN PARA QUE LOS RETIROS SIN CUENTA ACTUALICEN SU ESTADO
+-- AUTOMÁTICAMENTE
 SET GLOBAL event_scheduler = ON;
 
+
+-- EVENTO QUE CADA 10 SEGUNDOS CHECA SI DEBE ACTUALIZAR EL ESTADO DE LOS RETIROS SIN CUENTA
 DELIMITER //
 CREATE EVENT actualizarEstadoRetiros
 ON SCHEDULE EVERY 10 SECOND -- Cambiar a la frecuencia deseada, por ejemplo, cada minuto
@@ -157,19 +160,7 @@ BEGIN
 END; //
 DELIMITER ;
 
-SELECT o.folio, o.tipo, o.monto, o.fechaHoraEjec,
-o.numCuentaEmisora, t.numCuentaReceptora,
-rsc.contrasenia, rsc.fechaHoraCobro  FROM Operaciones o
-LEFT JOIN Transferencias t ON o.folio = t.folio
-LEFT JOIN Retiros r ON o.folio = r.folio
-LEFT JOIN RetirosSinCuenta rsc ON o.folio = rsc.folio
-LEFT JOIN Depositos d ON o.folio = d.folio
-INNER JOIN Cuentas cu on o.numCuentaEmisora = numCuenta
-INNER JOIN Clientes cl on cu.idCliente = cl.idCliente
-WHERE cl.idCliente = 1;
-
-select * from todasOperaciones;
-
+-- COMIENZAN LOS INSERTS DE MUESTRA
 -- Inserts para la tabla Clientes
 INSERT INTO Clientes (nombres, apellidoPaterno, apellidoMaterno, fechaNacimiento, correo, contrasenia) VALUES
 ('Juan', 'Perez', 'Gonzalez', '1990-05-15', 'a', AES_ENCRYPT('a', 'pipucatepipucate')),
@@ -182,8 +173,6 @@ INSERT INTO Clientes (nombres, apellidoPaterno, apellidoMaterno, fechaNacimiento
 ('Carlos', 'Sanchez', 'Perez', '1992-12-20', 'h@h.com', AES_ENCRYPT('h', 'pipucatepipucate')),
 ('Alejandra', 'Gomez', 'Luna', '1980-08-15', 'i@i.com', AES_ENCRYPT('i', 'pipucatepipucate')),
 ('Javier', 'Gutierrez', 'Fernandez', '1973-06-28', 'j@j.com', AES_ENCRYPT('j', 'pipucatepipucate'));
-
-select * from clientes where contrasenia = AES_ENCRYPT('ff', 'pipucatepipucate');
 
 -- Inserts para la tabla Direcciones
 INSERT INTO Direcciones (codigoPostal, colonia, calle, numExterior, idCliente) VALUES
