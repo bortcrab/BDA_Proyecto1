@@ -9,7 +9,9 @@ import dtos.OperacionDTO;
 import dtos.Usuario;
 import java.awt.Component;
 import java.sql.Date;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -29,7 +31,10 @@ public class FrmHistorial extends javax.swing.JFrame {
     private IOperacionNegocio operacionNegocio;
     private ICuentaNegocio cuentaNegocio;
     private int pagina = 1;
-    private final int LIMITE = 2;
+    private final int LIMITE = 3;
+    private int anchoOriginal5;
+    private int anchoOriginal6;
+    private int anchoOriginal7;
 
     /**
      * Creates new form FrmHistorial
@@ -41,12 +46,15 @@ public class FrmHistorial extends javax.swing.JFrame {
         this.operacionNegocio = datos.getOperacionNegocio();
         this.cuentaNegocio = datos.getCuentaNegocio();
         cargarOperacionesEnTabla(usuario.getCliente().getId(), "Todos", null, null);
+        anchoOriginal5 = tblOperaciones.getColumnModel().getColumn(5).getWidth();
+        anchoOriginal6 = tblOperaciones.getColumnModel().getColumn(6).getWidth();
+        anchoOriginal7 = tblOperaciones.getColumnModel().getColumn(7).getWidth();
     }
 
     private void cargarOperacionesEnTabla(int idCliente, String tipo, Date inicio, Date fin) {
         try {
             List<OperacionDTO> operacionesLista = operacionNegocio.buscarOperacionesTabla(idCliente, tipo, inicio, fin, pagina, LIMITE);
-            this.llenarTablaClientes(operacionesLista, tipo);
+            llenarTablaClientes(operacionesLista, tipo);
             lblPagina.setText("Página " + pagina);
         } catch (NegocioException ex) {
             pagina--;
@@ -65,24 +73,79 @@ public class FrmHistorial extends javax.swing.JFrame {
         
         switch (tipo) {
             case "Todos":
+                tblOperaciones.getColumnModel().getColumn(4).setHeaderValue("Cuenta origen");
+                tblOperaciones.getColumnModel().getColumn(5).setHeaderValue("Cuenta destino");
+//                tblOperaciones.getColumnModel().getColumn(5).setMinWidth(anchoOriginal5);
+//                tblOperaciones.getColumnModel().getColumn(5).setMaxWidth(anchoOriginal5);
+//                tblOperaciones.getColumnModel().getColumn(5).setWidth(anchoOriginal5);
+//                
+//                tblOperaciones.getColumnModel().getColumn(6).setMinWidth(anchoOriginal6);
+//                tblOperaciones.getColumnModel().getColumn(6).setMaxWidth(anchoOriginal6);
+//                tblOperaciones.getColumnModel().getColumn(6).setWidth(anchoOriginal6);
+//
+//                tblOperaciones.getColumnModel().getColumn(7).setMinWidth(anchoOriginal7);
+//                tblOperaciones.getColumnModel().getColumn(7).setMaxWidth(anchoOriginal7);
+//                tblOperaciones.getColumnModel().getColumn(7).setWidth(anchoOriginal7);
                 break;
             case "Transferencia":
-                tblOperaciones.getColumnModel().getColumn(6).setMinWidth(0);
-                tblOperaciones.getColumnModel().getColumn(6).setMaxWidth(0);
-                tblOperaciones.getColumnModel().getColumn(6).setWidth(0);
-
-                tblOperaciones.getColumnModel().getColumn(7).setMinWidth(0);
-                tblOperaciones.getColumnModel().getColumn(7).setMaxWidth(0);
-                tblOperaciones.getColumnModel().getColumn(7).setWidth(0);
+                tblOperaciones.getColumnModel().getColumn(4).setHeaderValue("Cuenta origen");
+                tblOperaciones.getColumnModel().getColumn(5).setHeaderValue("Cuenta destino");
+//                tblOperaciones.getColumnModel().getColumn(5).setMinWidth(1);
+//                tblOperaciones.getColumnModel().getColumn(5).setMaxWidth(1);
+//                tblOperaciones.getColumnModel().getColumn(5).setWidth(1);
+//                
+//                tblOperaciones.getColumnModel().getColumn(6).setMinWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(6).setMaxWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(6).setWidth(0);
+//
+//                tblOperaciones.getColumnModel().getColumn(7).setMinWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(7).setMaxWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(7).setWidth(0);
                 break;
             case "Retiro":
-                
+                tblOperaciones.getColumnModel().getColumn(4).setHeaderValue("No. de cuenta");
+//                tblOperaciones.getColumnModel().getColumn(4).setHeaderValue("No. de cuenta");
+//                tblOperaciones.getColumnModel().getColumn(5).setMinWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(5).setMaxWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(5).setWidth(0);
+//                
+//                tblOperaciones.getColumnModel().getColumn(6).setMinWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(6).setMaxWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(6).setWidth(0);
+//
+//                tblOperaciones.getColumnModel().getColumn(7).setMinWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(7).setMaxWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(7).setWidth(0);
                 break;
             case "Retiro sin cuenta":
-                
+                tblOperaciones.getColumnModel().getColumn(4).setHeaderValue("No. de cuenta");
+//                tblOperaciones.getColumnModel().getColumn(4).setHeaderValue("No. de cuenta");
+//                tblOperaciones.getColumnModel().getColumn(5).setMinWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(5).setMaxWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(5).setWidth(0);
+//                
+//                tblOperaciones.getColumnModel().getColumn(6).setMinWidth(1);
+//                tblOperaciones.getColumnModel().getColumn(6).setMaxWidth(1);
+//                tblOperaciones.getColumnModel().getColumn(6).setWidth(1);
+//
+//                tblOperaciones.getColumnModel().getColumn(7).setMinWidth(1);
+//                tblOperaciones.getColumnModel().getColumn(7).setMaxWidth(1);
+//                tblOperaciones.getColumnModel().getColumn(7).setWidth(1);
                 break;
             case "Depósito":
-                
+                tblOperaciones.getColumnModel().getColumn(4).setHeaderValue("No. de cuenta");
+//                tblOperaciones.getColumnModel().getColumn(4).setHeaderValue("No. de cuenta");
+//                tblOperaciones.getColumnModel().getColumn(5).setMinWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(5).setMaxWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(5).setWidth(0);
+//                
+//                tblOperaciones.getColumnModel().getColumn(6).setMinWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(6).setMaxWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(6).setWidth(0);
+//
+//                tblOperaciones.getColumnModel().getColumn(7).setMinWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(7).setMaxWidth(0);
+//                tblOperaciones.getColumnModel().getColumn(7).setWidth(0);
                 break;
             default:
                 throw new AssertionError();
@@ -94,16 +157,21 @@ public class FrmHistorial extends javax.swing.JFrame {
                 Object[] fila = new Object[8];
                 fila[0] = row.getFolio();
                 fila[1] = row.getTipo();
-                fila[2] = row.getMonto();
+                fila[2] = formatearMonto(Float.parseFloat(row.getMonto()));
                 fila[3] = row.getFechaHora();
-                fila[4] = row.getNumCuentaOrigen();
-                fila[5] = row.getNumCuentaDestino();
-                fila[6] = row.getEstado();
-                fila[7] = row.getFechaHoraCobro();
+                fila[4] = "#" + row.getNumCuentaOrigen();
+                fila[5] = row.getNumCuentaDestino() != 0 ? "#" + row.getNumCuentaDestino() : "-";
+                fila[6] = row.getEstado() != null ? row.getEstado() : "-";
+                fila[7] = row.getFechaHoraCobro() != null ? row.getFechaHoraCobro() : "-";
 
                 modeloTabla.addRow(fila);
             });
         }
+    }
+    
+    private String formatearMonto(float monto) {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.US);
+        return formatter.format(monto);
     }
 
     /**
@@ -159,7 +227,7 @@ public class FrmHistorial extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Folio", "Tipo", "Monto", "Fecha y hora ejecución", "Origen", "Destino", "Estado", "Fecha y hora de cobro"
+                "Folio", "Tipo", "Monto", "Fecha y hora ejecución", "Cuenta origen", "Cuenta destino", "Estado", "Fecha y hora de cobro"
             }
         ));
         jScrollPane2.setViewportView(tblOperaciones);
