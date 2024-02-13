@@ -8,6 +8,7 @@ import negocio.IClienteNegocio;
 import negocio.ICuentaNegocio;
 import negocio.IDireccionNegocio;
 import negocio.IOperacionNegocio;
+import utilerias.Validadores;
 
 /**
  *
@@ -18,12 +19,14 @@ public class Datos {
     private IDireccionNegocio direccionNegocio;
     private ICuentaNegocio cuentaNegocio;
     private IOperacionNegocio operacionNegocio;
+    private Validadores validadores;
 
-    public Datos(IClienteNegocio clienteNegocio, IDireccionNegocio direccionNegocio, ICuentaNegocio cuentaNegocio, IOperacionNegocio operacionNegocio) {
+    public Datos(IClienteNegocio clienteNegocio, IDireccionNegocio direccionNegocio, ICuentaNegocio cuentaNegocio, IOperacionNegocio operacionNegocio, Validadores validadores) {
         this.clienteNegocio = clienteNegocio;
         this.direccionNegocio = direccionNegocio;
         this.cuentaNegocio = cuentaNegocio;
         this.operacionNegocio = operacionNegocio;
+        this.validadores = validadores;
     }
 
     public IClienteNegocio getClienteNegocio() {

@@ -25,6 +25,7 @@ import persistencia.IDireccionDAO;
 import persistencia.IOperacionDAO;
 import persistencia.OperacionDAO;
 import presentacion.FrmLogin;
+import utilerias.Validadores;
 
 /**
  *
@@ -54,7 +55,9 @@ public class Main {
         IOperacionDAO operacionDAO = new OperacionDAO(conexionBD);
         IOperacionNegocio operacionNegocio = new OperacionNegocio(operacionDAO);
         
-        Datos datos = new Datos(clienteNegocio, direccionNegocio, cuentaNegocio, operacionNegocio);
+        Validadores validadores = new Validadores();
+        
+        Datos datos = new Datos(clienteNegocio, direccionNegocio, cuentaNegocio, operacionNegocio, validadores);
 
         FrmLogin principal = new FrmLogin(datos);
         principal.setVisible(true);

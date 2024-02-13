@@ -155,7 +155,7 @@ public class FrmLogin extends javax.swing.JFrame {
     private void btnIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIngresarActionPerformed
         ClienteDTO clienteDTO = new ClienteDTO(txtCorreo.getText(), txtContrasenia.getText());
         try {
-            clienteDTO = clienteNegocio.buscarCliente(clienteDTO);
+            clienteDTO = clienteNegocio.buscarCliente(clienteDTO);            
             DireccionDTO direccionDTO = direccionNegocio.buscarDireccion(clienteDTO.getId());
             Usuario usuario = new Usuario(clienteDTO, direccionDTO);
             FrmMenu frmMenu = new FrmMenu(datos, usuario);
@@ -164,9 +164,6 @@ public class FrmLogin extends javax.swing.JFrame {
         } catch (NegocioException ex) {
             Logger.getLogger(FrmLogin.class.getName()).log(Level.SEVERE, null, ex);
         }
-//        clienteDTO = clienteNegocio.guardar(clienteDTO);
-//        DireccionDTO direccionDTO = new DireccionDTO(txtCodigoPostal.getText(), txtColonia.getText(), txtCalle.getText(), txtNumExterior.getText(), clienteDTO.getId());
-//        direccionNegocio.guardar(direccionDTO);
     }//GEN-LAST:event_btnIngresarActionPerformed
 
     private void lblRegistroMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblRegistroMouseClicked
