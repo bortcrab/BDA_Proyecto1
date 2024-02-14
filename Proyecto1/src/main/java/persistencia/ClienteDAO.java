@@ -1,6 +1,5 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * ClienteDAO.java
  */
 package persistencia;
 
@@ -11,25 +10,43 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
+ * Clase que implementa los metodos para leer y escribir la información de los
+ * clientes en la base de datos
  *
  * @author jorge
  */
 public class ClienteDAO implements IClienteDAO {
 
-    public IConexionBD conexionBD;
+    private IConexionBD conexionBD;
     private Logger logger = Logger.getLogger(ClienteDAO.class.getName());
 
+    /**
+     * Constructor que establece la conexión utilizada para comunicarse con la
+     * base de datos
+     *
+     * @param conexionBD Conexión a utilizar para comunicarse con la base de
+     * datos
+     */
     public ClienteDAO(IConexionBD conexionBD) {
         this.conexionBD = conexionBD;
     }
 
+    /**
+     * Realiza la consulta que busca un cliente en la base de datos dado un
+     * objeto de ClienteEntidad
+     *
+     * @param clienteEntidad Objeto que representa el cliente que se desea
+     * buscar en la base de datos
+     * @return Cliente obtenido en la consulta a la base de datos
+     * @throws PersistenciaException Cuando ocurre un error al realizar la
+     * consulta
+     */
     @Override
     public ClienteEntidad buscarCliente(ClienteEntidad clienteEntidad) throws PersistenciaException {
         try (Connection conexion = this.conexionBD.crearConexion()) {
@@ -38,19 +55,33 @@ public class ClienteDAO implements IClienteDAO {
             ResultSet resultado = comandoSQL.executeQuery(codigoSQL);
             if (resultado.next()) {
                 clienteEntidad = convertirResultado(resultado);
+            } else {
+                throw new SQLException();
             }
             logger.log(Level.INFO, "Se obtuvieron los datos del cliente: " + clienteEntidad.getIdCliente());
             return clienteEntidad;
         } catch (SQLException sqle) {
             // Hacer uso de Logger
-            logger.log(Level.SEVERE, "Ocurrió un error al obtener los datos del cliente.", sqle);
+            logger.log(Level.SEVERE, "Ocurrió un error al obtener los datos del cliente.");
             throw new PersistenciaException("Ocurrió un error al leer la base de datos, inténtelo de nuevo y si el error persiste comuníquese con el encargado del sistema.");
         } catch (Exception ex) {
             throw new PersistenciaException(ex.getMessage());
         }
     }
+    
+    
 
-    public ClienteEntidad convertirResultado(ResultSet resultado) throws SQLException {
+    /**
+     * Convierte el resultado de una operación realizada en la base de datos a
+     * un objeto de ClienteEntidad
+     *
+     * @param resultado Resultado de una operación de la base de datos
+     * @return Un objeto de ClienteEntidad con la información obtenidad de la
+     * base de datos
+     * @throws SQLException Si ocurre un error al obtener la información del
+     * resultado
+     */
+    private ClienteEntidad convertirResultado(ResultSet resultado) throws SQLException {
         ClienteEntidad clienteEntidad = new ClienteEntidad();
         clienteEntidad.setIdCliente(resultado.getInt("idCliente"));
         clienteEntidad.setNombres(resultado.getString("nombres"));
@@ -62,6 +93,15 @@ public class ClienteDAO implements IClienteDAO {
         return clienteEntidad;
     }
 
+    /**
+     * Guarda en la base de datos la información de un cliente nuevo
+     *
+     * @param clienteEntidad Cliente con la información a guardar en la base de
+     * datos
+     * @return Cliente con la información guardada
+     * @throws PersistenciaException Si ocurre un error al escribir la
+     * información en la base de datos
+     */
     @Override
     public ClienteEntidad guardar(ClienteEntidad clienteEntidad) throws PersistenciaException {
         try (Connection conexion = this.conexionBD.crearConexion()) {
@@ -82,11 +122,21 @@ public class ClienteDAO implements IClienteDAO {
             }
         } catch (SQLException sqle) {
             // hacer uso de Logger
-            logger.log(Level.SEVERE, "Ocurrió un error al agregar el cliente.");
-            throw new PersistenciaException("Ocurrió un error al agregar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
+            logger.log(Level.SEVERE, "Ocurrió un error al conectarse con la base de datos.");
+            throw new PersistenciaException("Ocurrió un error al conectarse con la base de datos, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
         }
     }
 
+    /**
+     * Metodo auxiliar que contiene la operación de inserción utilizada para
+     * guardar un cliente en la base de datos
+     *
+     * @param clienteEntidad Cliente con la información a guardar en la base de
+     * datos
+     * @param conexion Conexión a la base de datos donde se lleva a cabo la
+     * operación
+     * @throws SQLException Si ocurre un error al hacer la operación
+     */
     private void insertarCliente(ClienteEntidad clienteEntidad, Connection conexion) throws SQLException {
         String insertCliente = "INSERT INTO Clientes (nombres, apellidoPaterno, apellidoMaterno, fechaNacimiento, correo, contrasenia) VALUES (?, ?, ?, ?, ?, AES_ENCRYPT(?, A'pipucatepipucate'));";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(insertCliente, Statement.RETURN_GENERATED_KEYS)) {
@@ -106,6 +156,14 @@ public class ClienteDAO implements IClienteDAO {
         }
     }
 
+    /**
+     * Edita la información de un cliente existente en la base de datos
+     *
+     * @param clienteEntidad Objeto con la información a ingresar a la base de
+     * datos de un cliente existente
+     * @throws PersistenciaException Si ocurre un error al escribir la
+     * información en la base de datos
+     */
     @Override
     public void editar(ClienteEntidad clienteEntidad) throws PersistenciaException {
         try (Connection conexion = this.conexionBD.crearConexion()) {
@@ -125,11 +183,21 @@ public class ClienteDAO implements IClienteDAO {
             }
         } catch (SQLException sqle) {
             // hacer uso de Logger
-            logger.log(Level.SEVERE, "Ocurrió un error al actualizar el cliente.", sqle);
-            throw new PersistenciaException("Ocurrió un error al registrar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
+            logger.log(Level.SEVERE, "Ocurrió un error al conectarse con la base de datos.", sqle);
+            throw new PersistenciaException("Ocurrió un error al conectarse con la base de datos, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
         }
     }
-    
+
+    /**
+     * Metodo auxiliar que contiene la operación de actualización utilizada para
+     * editar la información de un cliente en la base de datos
+     *
+     * @param clienteEntidad Cliente con la información a guardar en la base de
+     * datos
+     * @param conexion Conexión a la base de datos donde se lleva a cabo la
+     * operación
+     * @throws SQLException Si ocurre un error al hacer la operación
+     */
     private void actualizarCliente(ClienteEntidad clienteEntidad, Connection conexion) throws SQLException {
         String updateCliente = "UPDATE Clientes set nombres = ?, apellidoPaterno = ?, apellidoMaterno = ?, fechaNacimiento = ?, correo = ?, contrasenia = sha2(?, 512) WHERE idCliente = ?;";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(updateCliente)) {
@@ -145,6 +213,7 @@ public class ClienteDAO implements IClienteDAO {
         }
     }
     
+    @Override
     public String obtenerContrasenia(int idCliente) throws PersistenciaException {
         String contrasenia = "";
         try (Connection conexion = this.conexionBD.crearConexion()) {

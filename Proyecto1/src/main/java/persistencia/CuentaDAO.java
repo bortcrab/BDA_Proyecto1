@@ -1,6 +1,5 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * CuentaDAO.java
  */
 package persistencia;
 
@@ -19,18 +18,37 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Clase que implementa las funciones para leer y escribir información de una
+ * cuenta en la base de datos
  *
  * @author bortc
  */
 public class CuentaDAO implements ICuentaDAO {
 
-    public IConexionBD conexionBD;
+    private IConexionBD conexionBD;
     private Logger logger = Logger.getLogger(CuentaDAO.class.getName());
 
+    /**
+     * Constructor que establece la conexión utilizada para comunicarse con la
+     * base de datos
+     *
+     * @param conexionBD Conexión a utilizar para comunicarse con la base de
+     * datos
+     */
     public CuentaDAO(IConexionBD conexionBD) {
         this.conexionBD = conexionBD;
     }
 
+    /**
+     * Obtiene las cuentas que estan a nombre del cliente con el id dado por el
+     * parametro
+     *
+     * @param idCliente id del cliente del cual se desea obtener sus cuentas
+     * @return Una lista con las cuentas del cliente cuyo id coincide con el del
+     * parametro
+     * @throws PersistenciaException Si ocurre un error al obtener la
+     * información de las cuentas de la base de datos
+     */
     @Override
     public List<CuentaEntidad> obtenerCuentas(int idCliente) throws PersistenciaException {
         try (Connection conexion = this.conexionBD.crearConexion()) {
@@ -48,15 +66,24 @@ public class CuentaDAO implements ICuentaDAO {
                 listaCuentasEntidad.add(cuentaEntidad);
             }
 
-            logger.log(Level.INFO, "Se obtuvo la lista de clientes.");
+            logger.log(Level.INFO, "Se obtuvo la lista de cuentas.");
             return listaCuentasEntidad;
         } catch (SQLException sqle) {
             // hacer uso de Logger
-            logger.log(Level.SEVERE, "Ocurrió un error al obtener los clientes.", sqle);
+            logger.log(Level.SEVERE, "Ocurrió un error al obtener las cuentas.");
             throw new PersistenciaException("Ocurrió un error al leer la base de datos, inténtelo de nuevo y si el error persiste comuníquese con el encargado del sistema.");
         }
     }
 
+    /**
+     * Realiza la consulta que busca una cuenta en la base de datos dado un
+     * número de cuenta
+     *
+     * @param numCuenta Número de la cuenta a buscar en la base de datos
+     * @return Cuenta obtenida en la consulta a la base de datos
+     * @throws PersistenciaException Cuando ocurre un error al realizar la
+     * consulta
+     */
     @Override
     public CuentaEntidad buscarCuenta(int numCuenta) throws PersistenciaException {
         CuentaEntidad cuentaEntidad = new CuentaEntidad();
@@ -69,22 +96,22 @@ public class CuentaDAO implements ICuentaDAO {
             } else {
                 throw new PersistenciaException("No se encontró la cuenta.");
             }
-            logger.log(Level.INFO, "Se obtuvieron los datos del cliente: " + cuentaEntidad.getIdCliente());
+            logger.log(Level.INFO, "Se obtuvieron los datos de la cuenta: " + cuentaEntidad.getIdCliente());
             return cuentaEntidad;
         } catch (SQLException sqle) {
             // Hacer uso de Logger
-            logger.log(Level.SEVERE, "Ocurrió un error al obtener los datos del cliente.", sqle);
+            logger.log(Level.SEVERE, "Ocurrió un error al obtener los datos de la cuenta.");
             throw new PersistenciaException("Ocurrió un error al leer la base de datos, inténtelo de nuevo y si el error persiste comuníquese con el encargado del sistema.");
         }
     }
-    
+
     @Override
     public CuentaEntidad buscarCuenta(int folio, String contrasenia) throws PersistenciaException {
         CuentaEntidad cuentaEntidad = new CuentaEntidad();
         try (Connection conexion = this.conexionBD.crearConexion()) {
             String codigoSQL = "SELECT c.* FROM Cuentas c "
-                             + "INNER JOIN Operaciones o ON c.numCuenta = o.numCuentaEmisora "
-                             + "WHERE o.folio = " + folio + " AND c.estaEliminado = 0;";
+                    + "INNER JOIN Operaciones o ON c.numCuenta = o.numCuentaEmisora "
+                    + "WHERE o.folio = " + folio + " AND c.estaEliminado = 0;";
             Statement comandoSQL = conexion.createStatement();
             ResultSet resultado = comandoSQL.executeQuery(codigoSQL);
             if (resultado.next()) {
@@ -101,7 +128,17 @@ public class CuentaDAO implements ICuentaDAO {
         }
     }
 
-    public CuentaEntidad convertirResultado(ResultSet resultado) throws SQLException {
+    /**
+     * Convierte el resultado de una operación realizada en la base de datos a
+     * un objeto de CuentaEntidad
+     *
+     * @param resultado Resultado de una operación de la base de datos
+     * @return Un objeto de CuentaEntidad con la información obtenidad de la
+     * base de datos
+     * @throws SQLException Si ocurre un error al obtener la información del
+     * resultado
+     */
+    private CuentaEntidad convertirResultado(ResultSet resultado) throws SQLException {
         CuentaEntidad cuentaEntidad = new CuentaEntidad();
         cuentaEntidad.setNumCuenta(resultado.getInt("numCuenta"));
         cuentaEntidad.setSaldo(resultado.getFloat("saldo"));
@@ -111,6 +148,15 @@ public class CuentaDAO implements ICuentaDAO {
         return cuentaEntidad;
     }
 
+    /**
+     * Guarda en la base de datos la información de una cuenta nueva
+     *
+     * @param cuentaEntidad Cuenta con la información a guardar en la base de
+     * datos
+     * @return Cuenta con la información guardada
+     * @throws PersistenciaException Si ocurre un error al escribir la
+     * información en la base de datos
+     */
     @Override
     public CuentaEntidad guardar(CuentaEntidad cuentaEntidad) throws PersistenciaException {
         try (Connection conexion = conexionBD.crearConexion()) {
@@ -121,21 +167,31 @@ public class CuentaDAO implements ICuentaDAO {
                 insertarCuenta(cuentaEntidad, conexion);
                 // Confirmar la transacción
                 conexion.commit();
-                logger.log(Level.INFO, "Se agregó un cliente a la tabla.");
+                logger.log(Level.INFO, "Se agregó una cuenta a la tabla.");
                 return cuentaEntidad;
             } catch (SQLException ex) {
                 conexion.rollback();
                 // hacer uso de Logger
-                logger.log(Level.SEVERE, "Ocurrió un error al insertar el cliente en la tabla.");
-                throw new PersistenciaException("Ocurrió un error al agregar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
+                logger.log(Level.SEVERE, "Ocurrió un error al insertar la cuenta en la tabla.");
+                throw new PersistenciaException("Ocurrió un error al agregar la cuenta, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
             }
         } catch (SQLException sqle) {
             // hacer uso de Logger
-            logger.log(Level.SEVERE, "Ocurrió un error al agregar el cliente.");
-            throw new PersistenciaException("Ocurrió un error al agregar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
+            logger.log(Level.SEVERE, "Ocurrió un error al agregar la cuenta.");
+            throw new PersistenciaException("Ocurrió un error al conectarse con la base de datos, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
         }
     }
 
+    /**
+     * Metodo auxiliar que contiene la operación de inserción utilizada para
+     * guardar una cuenta en la base de datos
+     *
+     * @param cuentaEntidad Cuenta con la información a guardar en la base de
+     * datos
+     * @param conexion Conexión a la base de datos donde se lleva a cabo la
+     * operación
+     * @throws SQLException Si ocurre un error al hacer la operación
+     */
     private void insertarCuenta(CuentaEntidad cuentaEntidad, Connection conexion) throws SQLException {
         String insertCuenta = "INSERT INTO Cuentas (saldo, fechaApertura, estaEliminado, idCliente) VALUES (?, CURRENT_DATE(), ?, ?);";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(insertCuenta, Statement.RETURN_GENERATED_KEYS)) {
@@ -152,6 +208,15 @@ public class CuentaDAO implements ICuentaDAO {
         }
     }
 
+    /**
+     * Edita el saldo de una cuenta existente en la base de datos
+     *
+     * @param cuentaEntidad Cuenta con la información a ingresar a la base de
+     * datos de un cliente existente
+     * @param accion Tipo de edición a realizar, deposito o retiro
+     * @throws PersistenciaException Si ocurre un error al escribir la
+     * información en la base de datos
+     */
     @Override
     public void editar(CuentaEntidad cuentaEntidad, AccionCatalogoEnumerador accion) throws PersistenciaException {
         try (Connection conexion = this.conexionBD.crearConexion()) {
@@ -162,18 +227,32 @@ public class CuentaDAO implements ICuentaDAO {
                 editarCuenta(cuentaEntidad, conexion, accion);
                 // Confirmar la transacción
                 conexion.commit();
-                logger.log(Level.INFO, "Se eliminó un cliente de la tabla.");
+                logger.log(Level.INFO, "Se editó una cuenta de la tabla.");
             } catch (SQLException ex) {
                 conexion.rollback();
                 // hacer uso de Logger
-                throw new PersistenciaException("Ocurrió un error al eliminar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
+                logger.log(Level.SEVERE, "Ocurrió un error al editar la cuenta en la tabla.");
+                throw new PersistenciaException("Ocurrió un error al realizar el " + ((accion == DEPOSITO) ? "deposito" : "retiro")
+                        + ", inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
             }
         } catch (SQLException sqle) {
             // hacer uso de Logger
-            throw new PersistenciaException("Ocurrió un error al registrar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
+            logger.log(Level.SEVERE, "Ocurrió un error al realizar la actualización de la cuenta en la tabla.");
+            throw new PersistenciaException("Ocurrió un error al conectarse con la base de datos, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
         }
     }
 
+    /**
+     * Metodo auxiliar que contiene la operación de actualización utilizada para
+     * editar el saldo de una cuenta en la base de datos
+     *
+     * @param cuentaEntidad Cuenta con la información a guardar en la base de
+     * datos
+     * @param conexion Conexión a la base de datos donde se lleva a cabo la
+     * operación
+     * @param accion Tipo de edición a realizar, deposito o retiro
+     * @throws SQLException Si ocurre un error al hacer la operación
+     */
     private void editarCuenta(CuentaEntidad cuentaEntidad, Connection conexion, AccionCatalogoEnumerador accion) throws SQLException {
         String updateCuenta;
         if (accion == DEPOSITO) {
@@ -191,29 +270,47 @@ public class CuentaDAO implements ICuentaDAO {
         }
     }
 
+    /**
+     * Elimina una cuenta asignando estatus de eliminada en la base de datos
+     *
+     * @param cuentaEntidad Cuenta a eliminar en la base de datos
+     * @throws PersistenciaException Si ocurre un error al actualizar el estatus
+     * de la cuenta en la base de datos
+     */
     @Override
-    public void borrar(CuentaEntidad cuentaEntidad) throws PersistenciaException {
+    public void eliminar(CuentaEntidad cuentaEntidad) throws PersistenciaException {
         try (Connection conexion = this.conexionBD.crearConexion()) {
             try {
                 // Desactivar el autocommit
                 conexion.setAutoCommit(false);
                 // Actualizar el cliente
-                borrarCuenta(cuentaEntidad, conexion);
+                eliminarCuenta(cuentaEntidad, conexion);
                 // Confirmar la transacción
                 conexion.commit();
-                logger.log(Level.INFO, "Se eliminó un cliente de la tabla.");
+                logger.log(Level.INFO, "Se eliminó una cuenta de la tabla.");
             } catch (SQLException ex) {
                 conexion.rollback();
                 // hacer uso de Logger
-                throw new PersistenciaException("Ocurrió un error al eliminar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
+                logger.log(Level.SEVERE, "Ocurrió un error al editar el estatus de la cuenta en la tabla.");
+                throw new PersistenciaException("Ocurrió un error al eliminar la cuenta, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
             }
         } catch (SQLException sqle) {
             // hacer uso de Logger
-            throw new PersistenciaException("Ocurrió un error al registrar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
+            logger.log(Level.SEVERE, "Ocurrió un error al realizar la actualización de la cuenta en la tabla.");
+            throw new PersistenciaException("Ocurrió un error al conectarse con la base de datos, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
         }
     }
 
-    private void borrarCuenta(CuentaEntidad cuentaEntidad, Connection conexion) throws SQLException {
+    /**
+     * Método auxiliar que contiene la operación de actualización utilizada para
+     * cambiar el estatus de una cuenta en la base de datos
+     *
+     * @param cuentaEntidad Cuenta a eliminar en la base de datos
+     * @param conexion Conexión a la base de datos donde se lleva a cabo la
+     * operación
+     * @throws SQLException Si ocurre un error al hacer la operación
+     */
+    private void eliminarCuenta(CuentaEntidad cuentaEntidad, Connection conexion) throws SQLException {
         String deleteCuenta = "UPDATE Cuentas set estaEliminado = ? WHERE numCuenta = ?;";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(deleteCuenta)) {
             preparedStatement.setBoolean(1, true);

@@ -116,7 +116,7 @@ public class CuentaNegocio implements ICuentaNegocio {
     public void borrar(CuentaDTO cuentaDTO) throws NegocioException {
         try {
             CuentaEntidad cuentaEntidad = convertirCuentaDTO_Entidad(cuentaDTO);
-            cuentaDAO.borrar(cuentaEntidad);
+            cuentaDAO.eliminar(cuentaEntidad);
         } catch (PersistenciaException pe) {
             System.out.println(pe.getMessage());
             throw new NegocioException(pe.getMessage());

@@ -1,5 +1,5 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Main.java
  */
 package main;
 
@@ -28,6 +28,7 @@ import presentacion.FrmLogin;
 import utilerias.Validadores;
 
 /**
+ * Clase principal del programa
  *
  * @author Usuario
  */
@@ -40,18 +41,18 @@ public class Main {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
             ex.printStackTrace();
         }
-        
+
         IConexionBD conexionBD = new ConexionBD();
-        
+
         IClienteDAO clienteDAO = new ClienteDAO(conexionBD);
         IClienteNegocio clienteNegocio = new ClienteNegocio(clienteDAO);
-        
+
         IDireccionDAO direccionDAO = new DireccionDAO(conexionBD);
         IDireccionNegocio direccionNegocio = new DireccionNegocio(direccionDAO);
-        
+
         ICuentaDAO cuentaDAO = new CuentaDAO(conexionBD);
         ICuentaNegocio cuentaNegocio = new CuentaNegocio(cuentaDAO);
-        
+
         IOperacionDAO operacionDAO = new OperacionDAO(conexionBD);
         IOperacionNegocio operacionNegocio = new OperacionNegocio(operacionDAO);
         

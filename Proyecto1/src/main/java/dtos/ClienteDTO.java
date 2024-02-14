@@ -1,11 +1,11 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * ClienteDTO.java
  */
 package dtos;
 
 /**
- *
+ * Objeto de transferencia para los datos de un cliente
+ * 
  * @author Diego Valenzuela Parra
  */
 public class ClienteDTO {
@@ -17,10 +17,24 @@ public class ClienteDTO {
     private String correo;
     private String contra;
     
+    /**
+     * Constructor vacio por defecto
+     */
     public ClienteDTO() {
         
     }
     
+    /**
+     * Constructor que inicializa los atributos de la clase 
+     * 
+     * @param id Id del cliente
+     * @param nombres Nombre del cliente
+     * @param apellidoP Apellido Paterno del cliente
+     * @param apellidoM Apellido Materno del cliente
+     * @param fechaNac Fecha de nacimiento del cliente
+     * @param correo Correo del cliente
+     * @param contra Contraseña del cliente
+     */
     public ClienteDTO(int id, String nombres, String apellidoP, String apellidoM, String fechaNac, String correo, String contra) {
         this.id = id;
         this.nombres = nombres;
@@ -31,6 +45,12 @@ public class ClienteDTO {
         this.contra = contra;
     }
     
+    /**
+     * Constructor que inicializa solo el correo y la contraseña del cliente
+     * 
+     * @param correo Correo del cliente
+     * @param contra Contraseña del cliente
+     */
     public ClienteDTO(String correo, String contra) {
         this.correo = correo;
         this.contra = contra;

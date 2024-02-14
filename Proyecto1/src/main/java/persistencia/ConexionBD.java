@@ -1,6 +1,6 @@
+
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * ConexionBD.java
  */
 package persistencia;
 
@@ -11,23 +11,31 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Clase que se utiliza para crear la conexión con la base de datos de MySQL
  *
  * @author Usuario
  */
 public class ConexionBD implements IConexionBD {
+
     private final String SERVER = "localhost";
-    private final String BASE_DATOS = "Proyecto1";
+    private final String BASE_DATOS = "proyecto1";
     private final String URL = "jdbc:mysql://" + SERVER + "/" + BASE_DATOS;
     private final String USUARIO = "root";
-    private final String CONTRASENIA = "root";
+    private final String CONTRASENIA = "juvito";
     private Logger logger = Logger.getLogger(ConexionBD.class.getName());
-    
+
+    /**
+     * Metodo que crea la conexión con la base de datos de MySQL
+     *
+     * @return Objeto de conexión para comunicarse con la base de datos
+     * @throws PersistenciaException Si ocurre un error al iniciar la conexión
+     */
     @Override
     public Connection crearConexion() throws PersistenciaException {
         try {
-        Connection conexion = DriverManager.getConnection(URL, USUARIO, CONTRASENIA);
-        logger.log(Level.INFO, "La conexión con la base de datos fue exitosa.");
-        return conexion;
+            Connection conexion = DriverManager.getConnection(URL, USUARIO, CONTRASENIA);
+            logger.log(Level.INFO, "La conexión con la base de datos fue exitosa.");
+            return conexion;
         } catch (SQLException sqle) {
             logger.log(Level.SEVERE, "Error al conectar con la base de datos.", sqle);
             throw new PersistenciaException("Ocurrió un error al conectar con la base de datos. Revise que las credenciales sean las correctas.");

@@ -1,14 +1,10 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * OperacionDAO
  */
 package persistencia;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.Key;
 import entidades.OperacionEntidad;
-import java.io.UnsupportedEncodingException;
+import java.security.Key;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -19,19 +15,41 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
+ * clase que implementa las funciones de lectura y escritura a la información de
+ * una operación en la base de datos
  *
  * @author Usuario
  */
 public class OperacionDAO implements IOperacionDAO {
 
-    public IConexionBD conexionBD;
+    private IConexionBD conexionBD;
+    private Logger logger = Logger.getLogger(DireccionDAO.class.getName());
 
+    /**
+     * Constructor que establece la conexión utilizada para comunicarse con la
+     * base de datos
+     *
+     * @param conexionBD Conexión a utilizar para comunicarse con la base de
+     * datos
+     */
     public OperacionDAO(IConexionBD conexionBD) {
         this.conexionBD = conexionBD;
     }
-
+    
+    /**
+     * Obtiene las operaciones realizadas por el cliente con el id dado por el
+     * parametro
+     *
+     * @param idCliente id del cliente del cual se desea obtener sus operaciones
+     * @return Una lista con las operaciones del cliente cuyo id coincide con el
+     * del parametro
+     * @throws PersistenciaException Si ocurre un error al obtener la
+     * información de las operaciones de la base de datos
+     */
     @Override
     public List<OperacionEntidad> buscarOperacionesTabla(int idCliente, String filtroTipo, Date inicio, Date fin, int limite, int offset) throws PersistenciaException {
         try {
@@ -68,7 +86,7 @@ public class OperacionDAO implements IOperacionDAO {
                     operacionesLista.add(operacionEntidad);
                 }
             }
-            //logger.log(Level.INFO, "Se obtuvo la lista de clientes.");
+            logger.log(Level.INFO, "Se obtuvo la lista de clientes.");
             return operacionesLista;
         } catch (SQLException sqle) {
             // hacer uso de Logger
@@ -77,7 +95,7 @@ public class OperacionDAO implements IOperacionDAO {
         }
     }
 
-    public String seleccionPeriodo(Date inicio, Date fin) throws PersistenciaException {
+    private String seleccionPeriodo(Date inicio, Date fin) throws PersistenciaException {
         String periodo = "";
         if (inicio == null || fin == null) {
             return periodo;
@@ -135,7 +153,16 @@ public class OperacionDAO implements IOperacionDAO {
         }
         return codigoSQL;
     }
-
+    
+    /**
+     * Guarda en la base de datos la información de una operacion nueva
+     *
+     * @param operacionEntidad Operacion con la información a guardar en la base
+     * de datos
+     * @return Operación con la información guardada
+     * @throws PersistenciaException Si ocurre un error al escribir la
+     * información en la base de datos
+     */
     @Override
     public OperacionEntidad guardar(OperacionEntidad operacionEntidad) throws PersistenciaException {
         try (Connection conexion = this.conexionBD.crearConexion()) {
@@ -151,16 +178,26 @@ public class OperacionDAO implements IOperacionDAO {
             } catch (SQLException ex) {
                 conexion.rollback();
                 // hacer uso de Logger
-                //logger.log(Level.SEVERE, "Ocurrió un error al insertar el cliente en la tabla.");
-                throw new PersistenciaException("Ocurrió un error al agregar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
+                logger.log(Level.SEVERE, "Ocurrió un error al insertar la operación en la tabla.");
+                throw new PersistenciaException("Ocurrió un error al agregar la operación, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
             }
         } catch (SQLException sqle) {
             // hacer uso de Logger
-            //logger.log(Level.SEVERE, "Ocurrió un error al agregar el cliente.");
-            throw new PersistenciaException("Ocurrió un error al agregar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
+            logger.log(Level.SEVERE, "Ocurrió un error al agregar la operación.");
+            throw new PersistenciaException("Ocurrió un error al conectarse con la base de datos, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
         }
     }
 
+    /**
+     * Metodo auxiliar que contiene la operación de inserción utilizada para
+     * guardar una operación en la base de datos
+     *
+     * @param operacionEntidad operación con la información a guardar en la base
+     * de datos
+     * @param conexion Conexión a la base de datos donde se lleva a cabo la
+     * operación
+     * @throws SQLException Si ocurre un error al hacer la operación
+     */
     private void insertarOperacion(OperacionEntidad operacionEntidad, Connection conexion) throws SQLException {
         String insertOperacion = "INSERT INTO Operaciones (monto, tipo, numCuentaEmisora) VALUES (?, ?, ?);";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(insertOperacion, Statement.RETURN_GENERATED_KEYS)) {
