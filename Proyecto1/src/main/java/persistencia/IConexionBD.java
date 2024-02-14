@@ -9,7 +9,8 @@ import java.sql.Connection;
  * Interfaz que defino los métodos a implementar en la clase que establece la
  * conexión con la base de datos de MySQL
  *
- * @author Usuario
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public interface IConexionBD {
 

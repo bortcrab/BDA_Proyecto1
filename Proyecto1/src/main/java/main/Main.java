@@ -3,7 +3,7 @@
  */
 package main;
 
-import dtos.Datos;
+import negocio.Datos;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import negocio.ClienteNegocio;
@@ -25,25 +25,25 @@ import persistencia.IDireccionDAO;
 import persistencia.IOperacionDAO;
 import persistencia.OperacionDAO;
 import presentacion.FrmLogin;
-import utilerias.Validadores;
 
 /**
- * Clase principal del programa
+ * Clase principal del programa.
  *
- * @author Usuario
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class Main {
 
     public static void main(String[] args) {
         try {
-            // Establecer el Look and Feel deseado (por ejemplo, Nimbus)
+            // Establecer el Look and Feel FlatLightLaf
             UIManager.setLookAndFeel("com.formdev.flatlaf.FlatLightLaf");
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
             ex.printStackTrace();
         }
-
+        
         IConexionBD conexionBD = new ConexionBD();
-
+        
         IClienteDAO clienteDAO = new ClienteDAO(conexionBD);
         IClienteNegocio clienteNegocio = new ClienteNegocio(clienteDAO);
 
@@ -55,10 +55,8 @@ public class Main {
 
         IOperacionDAO operacionDAO = new OperacionDAO(conexionBD);
         IOperacionNegocio operacionNegocio = new OperacionNegocio(operacionDAO);
-        
-        Validadores validadores = new Validadores();
-        
-        Datos datos = new Datos(clienteNegocio, direccionNegocio, cuentaNegocio, operacionNegocio, validadores);
+                
+        Datos datos = new Datos(clienteNegocio, direccionNegocio, cuentaNegocio, operacionNegocio);
 
         FrmLogin principal = new FrmLogin(datos);
         principal.setVisible(true);

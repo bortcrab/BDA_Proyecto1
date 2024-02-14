@@ -1,35 +1,46 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ * FrmPerfil.java
  */
 package presentacion;
 
 import dtos.ClienteDTO;
-import dtos.Datos;
+import negocio.Datos;
 import dtos.DireccionDTO;
 import dtos.Usuario;
 import enumeradores.AccionCatalogoEnumerador;
 import static enumeradores.AccionCatalogoEnumerador.*;
+import java.awt.event.KeyEvent;
 import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import negocio.IClienteNegocio;
 import negocio.IDireccionNegocio;
 import negocio.NegocioException;
 
 /**
+ * Esta clase representa una ventana de interfaz de usuario para crear o
+ * actualizar el perfil de un cliente.
  *
- * @author Usuario
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class FrmPerfil extends javax.swing.JFrame {
+
     Datos datos;
     Usuario usuario;
     IClienteNegocio clienteNegocio;
     IDireccionNegocio direccionNegocio;
     AccionCatalogoEnumerador accion;
-    
+
     /**
-     * Creates new form frmLogin
+     * Constructor de la clase FrmPerfil.
+     *
+     * @param datos Objeto de datos que contiene las instancias de los objetos
+     * de negocio necesarios.
+     * @param usuario Objeto Usuario que representa al usuario actual.
+     * @param accion Acción a realizar, puede ser NUEVO para registro de nuevo
+     * perfil o EDITAR para actualización de perfil existente.
      */
     public FrmPerfil(Datos datos, Usuario usuario, AccionCatalogoEnumerador accion) {
         initComponents();
@@ -38,7 +49,7 @@ public class FrmPerfil extends javax.swing.JFrame {
         this.clienteNegocio = datos.getClienteNegocio();
         this.direccionNegocio = datos.getDireccionNegocio();
         this.accion = accion;
-        
+
         if (accion == NUEVO) {
             lblTitulo.setText("Registro");
             btnAccion.setText("Registrar");
@@ -48,7 +59,10 @@ public class FrmPerfil extends javax.swing.JFrame {
             llenarCampos();
         }
     }
-    
+
+    /**
+     * Llena los campos del formulario con la información del usuario actual.
+     */
     private void llenarCampos() {
         txtNombre.setText(usuario.getCliente().getNombres());
         txtApellidoP.setText(usuario.getCliente().getApellidoP());
@@ -274,6 +288,11 @@ public class FrmPerfil extends javax.swing.JFrame {
         jLabel10.setText("Código postal");
 
         txtCodigoPostal.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtCodigoPostal.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtCodigoPostalKeyTyped(evt);
+            }
+        });
 
         jLabel11.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel11.setText("Colonia");
@@ -289,6 +308,11 @@ public class FrmPerfil extends javax.swing.JFrame {
         jLabel13.setText("Número exterior");
 
         txtNumExterior.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtNumExterior.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtNumExteriorKeyTyped(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -409,38 +433,58 @@ public class FrmPerfil extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Acción realizada cuando se presiona el botón de acción (Registrar o
+     * Actualizar). Valida los campos del formulario y realiza las acciones
+     * correspondientes según la acción especificada (NUEVO o EDITAR).
+     *
+     * @param evt El evento de acción.
+     */
     private void btnAccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAccionActionPerformed
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        if (accion == NUEVO) {
-            ClienteDTO clienteDTO = new ClienteDTO(0, txtNombre.getText(), txtApellidoP.getText(), txtApellidoM.getText(), sdf.format(dtchNacimiento.getDate()), txtCorreo.getText(), pwdContrasenia.getText());
-            try {
-                clienteDTO = clienteNegocio.guardar(clienteDTO);
-                DireccionDTO direccionDTO = new DireccionDTO(0, txtCodigoPostal.getText(), txtColonia.getText(), txtCalle.getText(), txtNumExterior.getText(), clienteDTO.getId());
-                direccionNegocio.guardar(direccionDTO);
-                FrmLogin frmLogin = new FrmLogin(datos);
-                frmLogin.setVisible(true);
-            } catch (NegocioException ex) {
-                Logger.getLogger(FrmPerfil.class.getName()).log(Level.SEVERE, null, ex);
+        if (txtNombre.getText().equals("") || txtApellidoP.getText().equals("") || txtApellidoM.getText().equals("")
+                || txtNombre.getText().equals("") || dtchNacimiento.getDate() == null || txtCorreo.getText().equals("")
+                || pwdContrasenia.getText().equals("") || !pwdContrasenia.getText().equals(pwdConfirmarContra.getText())
+                || txtCodigoPostal.getText().equals("") || txtColonia.getText().equals("") || txtCalle.getText().equals("")
+                || txtNumExterior.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, "Favor de no dejar campos vacíos.", "¡Error!", JOptionPane.ERROR_MESSAGE);
+        } else {
+            if (accion == NUEVO) {
+                ClienteDTO clienteDTO = new ClienteDTO(0, txtNombre.getText(), txtApellidoP.getText(), txtApellidoM.getText(), sdf.format(dtchNacimiento.getDate()), txtCorreo.getText(), pwdContrasenia.getText());
+                try {
+                    clienteDTO = clienteNegocio.guardar(clienteDTO);
+                    DireccionDTO direccionDTO = new DireccionDTO(0, txtCodigoPostal.getText(), txtColonia.getText(), txtCalle.getText(), txtNumExterior.getText(), clienteDTO.getId());
+                    direccionNegocio.guardar(direccionDTO);
+                    FrmLogin frmLogin = new FrmLogin(datos);
+                    frmLogin.setVisible(true);
+                } catch (NegocioException ex) {
+                    Logger.getLogger(FrmPerfil.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else if (accion == EDITAR) {
+                lblTitulo.setText("Registro");
+                ClienteDTO clienteDTO = new ClienteDTO(usuario.getCliente().getId(), txtNombre.getText(), txtApellidoP.getText(), txtApellidoM.getText(), sdf.format(dtchNacimiento.getDate()), txtCorreo.getText(), pwdContrasenia.getText());
+                try {
+                    clienteNegocio.editar(clienteDTO);
+                    DireccionDTO direccionDTO = new DireccionDTO(usuario.getDireccion().getCodigoDir(), txtCodigoPostal.getText(), txtColonia.getText(), txtCalle.getText(), txtNumExterior.getText(), clienteDTO.getId());
+                    direccionNegocio.editar(direccionDTO);
+                    usuario.setCliente(clienteDTO);
+                    usuario.setDireccion(direccionDTO);
+                    FrmMenu frmMenu = new FrmMenu(datos, usuario);
+                    frmMenu.setVisible(true);
+                } catch (NegocioException ex) {
+                    Logger.getLogger(FrmPerfil.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-        } else if (accion == EDITAR) {
-            lblTitulo.setText("Registro");
-            ClienteDTO clienteDTO = new ClienteDTO(usuario.getCliente().getId(), txtNombre.getText(), txtApellidoP.getText(), txtApellidoM.getText(), sdf.format(dtchNacimiento.getDate()), txtCorreo.getText(), pwdContrasenia.getText());
-            try {
-                clienteNegocio.editar(clienteDTO);
-                DireccionDTO direccionDTO = new DireccionDTO(usuario.getDireccion().getCodigoDir(), txtCodigoPostal.getText(), txtColonia.getText(), txtCalle.getText(), txtNumExterior.getText(), clienteDTO.getId());
-                direccionNegocio.editar(direccionDTO);
-                usuario.setCliente(clienteDTO);
-                usuario.setDireccion(direccionDTO);
-                FrmMenu frmMenu = new FrmMenu(datos, usuario);
-                frmMenu.setVisible(true);
-            } catch (NegocioException ex) {
-                Logger.getLogger(FrmPerfil.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            dispose();
         }
-        
-        dispose();
     }//GEN-LAST:event_btnAccionActionPerformed
 
+    /**
+     * Acción realizada cuando se presiona el botón "Volver". Se muestra el
+     * formulario correspondiente según la acción realizada (NUEVO o EDITAR).
+     *
+     * @param evt El evento de acción.
+     */
     private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
         if (accion == NUEVO) {
             FrmLogin frmLogin = new FrmLogin(datos);
@@ -451,6 +495,32 @@ public class FrmPerfil extends javax.swing.JFrame {
         }
         dispose();
     }//GEN-LAST:event_btnVolverActionPerformed
+
+    /**
+     * Método que permite ingresar solo números en el campo de texto del código
+     * postal.
+     *
+     * @param evt El evento de teclado.
+     */
+    private void txtCodigoPostalKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCodigoPostalKeyTyped
+        char c = evt.getKeyChar();
+        if (((c < '0') || (c > '9')) && (c != KeyEvent.VK_BACK_SPACE)) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtCodigoPostalKeyTyped
+
+    /**
+     * Método que permite ingresar solo números en el campo de texto del número
+     * exterior.
+     *
+     * @param evt El evento de teclado.
+     */
+    private void txtNumExteriorKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNumExteriorKeyTyped
+        char c = evt.getKeyChar();
+        if (((c < '0') || (c > '9')) && (c != KeyEvent.VK_BACK_SPACE)) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtNumExteriorKeyTyped
 
 //    /**
 //     * @param args the command line arguments

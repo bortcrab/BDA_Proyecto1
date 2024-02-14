@@ -1,13 +1,13 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ * FrmAbrirCuenta.java
  */
 package presentacion;
 
 import dtos.CuentaDTO;
-import dtos.Datos;
+import negocio.Datos;
 import dtos.OperacionDTO;
 import dtos.Usuario;
+import java.awt.event.KeyEvent;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
@@ -19,18 +19,25 @@ import negocio.IOperacionNegocio;
 import negocio.NegocioException;
 
 /**
+ * Esta clase representa una ventana de interfaz de usuario para abrir una nueva
+ * cuenta bancaria.
  *
- * @author jorge
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class FrmAbrirCuenta extends javax.swing.JFrame {
+
     Datos datos;
     Usuario usuario;
     IClienteNegocio clienteNegocio;
     ICuentaNegocio cuentaNegocio;
     IOperacionNegocio operacionNegocio;
-    
+
     /**
-     * Creates new form FrmCuenta
+     * Constructor de la clase FrmAbrirCuenta.
+     *
+     * @param datos el objeto de datos de la aplicación
+     * @param usuario el usuario actual de la aplicación
      */
     public FrmAbrirCuenta(Datos datos, Usuario usuario) {
         initComponents();
@@ -71,6 +78,11 @@ public class FrmAbrirCuenta extends javax.swing.JFrame {
         jLabel2.setText("Monto ($):");
 
         txtMonto.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtMonto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtMontoKeyTyped(evt);
+            }
+        });
 
         btnConfirmar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnConfirmar.setText("Confirmar");
@@ -150,12 +162,26 @@ public class FrmAbrirCuenta extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Crea una nueva instancia de FrmMenu, la hace visible y cierra la ventana
+     * actual.
+     *
+     * @param evt el evento de acción
+     */
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         FrmMenu frmMenu = new FrmMenu(datos, usuario);
         frmMenu.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
+    /**
+     * Verifica la contraseña ingresada por el usuario y, si es correcta, crea
+     * una nueva cuenta bancaria y realiza un depósito inicial si el monto
+     * ingresado es mayor que cero. Finalmente, muestra un mensaje de éxito y
+     * vuelve al menú principal.
+     *
+     * @param evt el evento de acción
+     */
     private void btnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmarActionPerformed
         String contrasenia = "";
         try {
@@ -188,29 +214,19 @@ public class FrmAbrirCuenta extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnConfirmarActionPerformed
 
-    private String hashContrasenia(String contraseniaOriginal) throws NoSuchAlgorithmException {
-        try {
-            StringBuilder sb = new StringBuilder();
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-            
-            // Actualizar el digest con los datos proporcionados
-            md.update(contraseniaOriginal.getBytes());
-            
-            // Calcular el hash
-            byte[] hashBytes = md.digest();
-            
-            // Convertir el hash a una representación hexadecimal
-            for (byte b : hashBytes) {
-                sb.append(String.format("%02x", b));
-            }
-            
-            return sb.toString();
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(FrmAbrirCuenta.class.getName()).log(Level.SEVERE, null, ex);
-            throw new NoSuchAlgorithmException(ex.getMessage());
+    /**
+     * Método que limita la entrada de texto a números en el campo de texto
+     * "Monto".
+     *
+     * @param evt el evento de teclado
+     */
+    private void txtMontoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMontoKeyTyped
+        char c = evt.getKeyChar();
+        if (((c < '0') || (c > '9')) && (c != KeyEvent.VK_BACK_SPACE)) {
+            evt.consume();
         }
-    }
-    
+    }//GEN-LAST:event_txtMontoKeyTyped
+
 //    /**
 //     * @param args the command line arguments
 //     */

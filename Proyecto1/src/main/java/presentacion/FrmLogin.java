@@ -1,16 +1,14 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ * FrmLogin.java
  */
 package presentacion;
 
 import dtos.ClienteDTO;
-import dtos.Datos;
+import negocio.Datos;
 import dtos.DireccionDTO;
 import dtos.Usuario;
 import static enumeradores.AccionCatalogoEnumerador.NUEVO;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import negocio.IClienteNegocio;
 import negocio.ICuentaNegocio;
 import negocio.IDireccionNegocio;
@@ -18,18 +16,23 @@ import negocio.IOperacionNegocio;
 import negocio.NegocioException;
 
 /**
+ * Esta clase representa una ventana de interfaz de usuario para iniciar sesión.
  *
- * @author Usuario
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class FrmLogin extends javax.swing.JFrame {
+
     Datos datos;
     IClienteNegocio clienteNegocio;
     IDireccionNegocio direccionNegocio;
     IOperacionNegocio operacionNegocio;
     ICuentaNegocio cuentaNegocio;
-    
+
     /**
-     * Creates new form frmLogin
+     * Método constructor
+     *
+     * @param datos el objeto de datos de la aplicación
      */
     public FrmLogin(Datos datos) {
         this.datos = datos;
@@ -152,26 +155,45 @@ public class FrmLogin extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Se intenta buscar al cliente utilizando las credenciales proporcionadas,
+     * se crea un objeto Usuario con los datos del cliente y su dirección, y se
+     * muestra el formulario del menú principal.
+     *
+     * @param evt El evento de acción.
+     */
     private void btnIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIngresarActionPerformed
         ClienteDTO clienteDTO = new ClienteDTO(txtCorreo.getText(), txtContrasenia.getText());
         try {
-            clienteDTO = clienteNegocio.buscarCliente(clienteDTO);            
+            clienteDTO = clienteNegocio.buscarCliente(clienteDTO);
             DireccionDTO direccionDTO = direccionNegocio.buscarDireccion(clienteDTO.getId());
             Usuario usuario = new Usuario(clienteDTO, direccionDTO);
             FrmMenu frmMenu = new FrmMenu(datos, usuario);
             frmMenu.setVisible(true);
             dispose();
         } catch (NegocioException ex) {
-            Logger.getLogger(FrmLogin.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Oops!", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnIngresarActionPerformed
 
+    /**
+     * Acción realizada cuando se hace clic en el enlace "Registro". Se muestra
+     * el formulario de perfil para registrar un nuevo usuario.
+     *
+     * @param evt El evento del mouse.
+     */
     private void lblRegistroMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblRegistroMouseClicked
         FrmPerfil frmPerfil = new FrmPerfil(datos, new Usuario(), NUEVO);
         frmPerfil.setVisible(true);
         dispose();
     }//GEN-LAST:event_lblRegistroMouseClicked
 
+    /**
+     * Acción realizada cuando se presiona el botón "Retiro Sin Cuenta". Se
+     * muestra el formulario de retiro sin cuenta.
+     *
+     * @param evt El evento de acción.
+     */
     private void btnRetiroSinCuentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetiroSinCuentaActionPerformed
         FrmRetiroSinCuenta frmRetiroSinCuenta = new FrmRetiroSinCuenta(datos);
         frmRetiroSinCuenta.setVisible(true);

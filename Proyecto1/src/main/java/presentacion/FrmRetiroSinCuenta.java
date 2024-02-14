@@ -1,13 +1,13 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ * FrmRetiroSinCuenta.java
  */
 package presentacion;
 
 import dtos.CuentaDTO;
-import dtos.Datos;
+import negocio.Datos;
 import dtos.OperacionDTO;
 import static enumeradores.AccionCatalogoEnumerador.*;
+import java.awt.event.KeyEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -16,16 +16,23 @@ import negocio.IOperacionNegocio;
 import negocio.NegocioException;
 
 /**
+ * Esta clase representa una ventana de interfaz de usuario para realizar
+ * retiros sin cuenta.
  *
- * @author jorge
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class FrmRetiroSinCuenta extends javax.swing.JFrame {
+
     Datos datos;
     ICuentaNegocio cuentaNegocio;
     IOperacionNegocio operacionNegocio;
-    
+
     /**
-     * Creates new form FrmRetiroSinCuenta
+     * Constructor de la clase FrmRetiroSinCuenta.
+     *
+     * @param datos Objeto de datos que contiene las instancias de los objetos
+     * de negocio necesarios.
      */
     public FrmRetiroSinCuenta(Datos datos) {
         initComponents();
@@ -62,11 +69,21 @@ public class FrmRetiroSinCuenta extends javax.swing.JFrame {
         jLabel2.setText("Folio:");
 
         txtFolio.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtFolio.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtFolioKeyTyped(evt);
+            }
+        });
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel3.setText("Contraseña:");
 
         pwdContrasenia.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        pwdContrasenia.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                pwdContraseniaKeyTyped(evt);
+            }
+        });
 
         btnRetirar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnRetirar.setText("Retirar");
@@ -144,37 +161,89 @@ public class FrmRetiroSinCuenta extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Acción realizada cuando se presiona el botón "Retirar". Verifica la
+     * validez del folio y la contraseña ingresados, y realiza el retiro sin
+     * cuenta si son correctos.
+     *
+     * @param evt El evento de acción.
+     */
     private void btnRetirarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetirarActionPerformed
-        String contrasenia = "";
-        try {
-            contrasenia = operacionNegocio.obtenerContrasenia(Integer.parseInt(txtFolio.getText()));
-        } catch (NegocioException ex) {
-            Logger.getLogger(FrmDepositoRetiro.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        if (contrasenia.equals(pwdContrasenia.getText())) {    
-            try {
-                CuentaDTO cuentaDTO = cuentaNegocio.buscarCuenta(Integer.parseInt(txtFolio.getText()), pwdContrasenia.getText());
-                OperacionDTO operacionDTO = operacionNegocio.obtenerOperacion(Integer.parseInt(txtFolio.getText()));
-                cuentaDTO.setSaldo(String.valueOf(operacionDTO.getMonto()));
-                cuentaNegocio.editar(cuentaDTO, EDITAR);
-                operacionNegocio.actualizarRetiroSinCuenta(Integer.parseInt(txtFolio.getText()));
-                JOptionPane.showMessageDialog(this, "Operación exitosa.", "¡Éxito!", JOptionPane.INFORMATION_MESSAGE);
-                FrmLogin frmLogin = new FrmLogin(datos);
-                frmLogin.setVisible(true);
-                dispose();
-            } catch (NegocioException ex) {
-                Logger.getLogger(FrmRetiroSinCuenta.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        if (txtFolio.getText().equals("") && pwdContrasenia.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, "Favor de ingresar un folio y una contraseña válida.", "Oops!", JOptionPane.ERROR_MESSAGE);
+        } else if (txtFolio.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, "Favor de ingresar un folio válido.", "Oops!", JOptionPane.ERROR_MESSAGE);
+        } else if (pwdContrasenia.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, "Favor de ingresar una contraseña válida.", "Oops!", JOptionPane.ERROR_MESSAGE);
         } else {
-            System.out.println("Contraseña errónea.");
+            String contrasenia = "";
+            try {
+                OperacionDTO operacionDTO = operacionNegocio.obtenerOperacion(Integer.parseInt(txtFolio.getText()));
+                if (operacionDTO.getTipo().equals("Retiro sin cuenta")) {
+                    contrasenia = operacionNegocio.obtenerContrasenia(Integer.parseInt(txtFolio.getText()));
+                    if (contrasenia.equals(pwdContrasenia.getText())) {
+                        try {
+                            CuentaDTO cuentaDTO = cuentaNegocio.buscarCuenta(Integer.parseInt(txtFolio.getText()), pwdContrasenia.getText());
+                            operacionDTO = operacionNegocio.obtenerOperacion(Integer.parseInt(txtFolio.getText()));
+                            cuentaDTO.setSaldo(String.valueOf(operacionDTO.getMonto()));
+                            operacionNegocio.actualizarRetiroSinCuenta(Integer.parseInt(txtFolio.getText()));
+                            cuentaNegocio.editar(cuentaDTO, EDITAR);
+                            JOptionPane.showMessageDialog(this, "Operación exitosa.", "¡Éxito!", JOptionPane.INFORMATION_MESSAGE);
+                            FrmLogin frmLogin = new FrmLogin(datos);
+                            frmLogin.setVisible(true);
+                            dispose();
+                        } catch (NegocioException ex) {
+                            Logger.getLogger(FrmRetiroSinCuenta.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Contraseña errónea.", "Oops!", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se encontró un retiro con tal folio.", "Oops!", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NegocioException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Oops!", JOptionPane.ERROR_MESSAGE);
+                Logger.getLogger(FrmDepositoRetiro.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_btnRetirarActionPerformed
 
+    /**
+     * Acción realizada cuando se presiona el botón "Cancelar". Se muestra el
+     * formulario de inicio de sesión.
+     *
+     * @param evt El evento de acción.
+     */
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         FrmLogin frmLogin = new FrmLogin(datos);
         frmLogin.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
+
+    /**
+     * Método que permite ingresar solo números en el campo de texto de la
+     * contraseña.
+     *
+     * @param evt El evento de teclado.
+     */
+    private void pwdContraseniaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_pwdContraseniaKeyTyped
+        char c = evt.getKeyChar();
+        if (((c < '0') || (c > '9')) && (c != KeyEvent.VK_BACK_SPACE)) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_pwdContraseniaKeyTyped
+
+    /**
+     * Método que permite ingresar solo números en el campo de texto del folio.
+     *
+     * @param evt El evento de teclado.
+     */
+    private void txtFolioKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtFolioKeyTyped
+        char c = evt.getKeyChar();
+        if (((c < '0') || (c > '9')) && (c != KeyEvent.VK_BACK_SPACE)) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtFolioKeyTyped
 
 //    /**
 //     * @param args the command line arguments

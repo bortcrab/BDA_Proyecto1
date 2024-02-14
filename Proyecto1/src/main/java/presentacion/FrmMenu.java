@@ -1,29 +1,39 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ * FrmMenu.java
  */
 package presentacion;
 
-import dtos.Datos;
+import negocio.Datos;
 import dtos.Usuario;
 import static enumeradores.AccionCatalogoEnumerador.*;
-import negocio.IOperacionNegocio;
+import javax.swing.JOptionPane;
+import negocio.ICuentaNegocio;
+import negocio.NegocioException;
 
 /**
+ * Esta clase representa una ventana de interfaz de usuario para mostrar todas
+ * las acciones que el cliente puede realizar.
  *
- * @author Usuario
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class FrmMenu extends javax.swing.JFrame {
+
     Datos datos;
     Usuario usuario;
-    
+    ICuentaNegocio cuentaNegocio;
+
     /**
-     * Creates new form FrmPrincipal
+     * Método constructor
+     *
+     * @param datos el objeto de datos de la aplicación
+     * @param usuario el usuario que está loggeado
      */
     public FrmMenu(Datos datos, Usuario usuario) {
         initComponents();
         this.datos = datos;
         this.usuario = usuario;
+        this.cuentaNegocio = datos.getCuentaNegocio();
         lblBienvenida.setText("¡Bienvenido, " + usuario.getCliente().getNombres() + "!");
     }
 
@@ -185,58 +195,142 @@ public class FrmMenu extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Acción realizada cuando se presiona el botón "Perfil". Se muestra el
+     * formulario de perfil para editar la información del usuario.
+     *
+     * @param evt El evento de acción.
+     */
     private void btnPerfilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPerfilActionPerformed
         FrmPerfil frmPerfil = new FrmPerfil(datos, usuario, EDITAR);
         frmPerfil.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnPerfilActionPerformed
 
+    /**
+     * Acción realizada cuando se presiona el botón "Transferencia". Se muestra
+     * el formulario de transferencia de fondos.
+     *
+     * @param evt El evento de acción.
+     */
     private void btnTransferenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTransferenciaActionPerformed
-        FrmTransferencia frmTransferencia = new FrmTransferencia(datos, usuario);
-        frmTransferencia.setVisible(true);
-        dispose();     
+        try {
+            cuentaNegocio.obtenerCuentas(usuario.getCliente().getId());
+            FrmTransferencia frmTransferencia = new FrmTransferencia(datos, usuario);
+            frmTransferencia.setVisible(true);
+            dispose();
+        } catch (NegocioException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Oops!", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnTransferenciaActionPerformed
 
+    /**
+     * Acción realizada cuando se presiona el botón "Historial". Se muestra el
+     * formulario de historial de transacciones.
+     *
+     * @param evt El evento de acción.
+     */
     private void btnHistorialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistorialActionPerformed
-        FrmHistorial frmHistorial = new FrmHistorial(datos, usuario);
-        frmHistorial.setVisible(true);
-        dispose();
+        try {
+            cuentaNegocio.obtenerCuentas(usuario.getCliente().getId());
+            FrmHistorial frmHistorial = new FrmHistorial(datos, usuario);
+            frmHistorial.setVisible(true);
+            dispose();
+        } catch (NegocioException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Oops!", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnHistorialActionPerformed
 
+    /**
+     * Acción realizada cuando se presiona el botón "Cerrar Sesión". Se muestra
+     * el formulario de inicio de sesión.
+     *
+     * @param evt El evento de acción.
+     */
     private void btnCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarSesionActionPerformed
         FrmLogin frmLogin = new FrmLogin(datos);
         frmLogin.setVisible(true);
-        dispose();        
+        dispose();
     }//GEN-LAST:event_btnCerrarSesionActionPerformed
 
+    /**
+     * Acción realizada cuando se presiona el botón "Abrir Cuenta". Se muestra
+     * el formulario para abrir una nueva cuenta bancaria.
+     *
+     * @param evt El evento de acción.
+     */
     private void btnAbrirCuentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirCuentaActionPerformed
         FrmAbrirCuenta frmAbrirCuenta = new FrmAbrirCuenta(datos, usuario);
         frmAbrirCuenta.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnAbrirCuentaActionPerformed
 
+    /**
+     * Acción realizada cuando se presiona el botón "Cancelar Cuenta". Se
+     * muestra el formulario para cancelar una cuenta bancaria existente.
+     *
+     * @param evt El evento de acción.
+     */
     private void btnCancelarCuentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarCuentaActionPerformed
-        FrmCancelarCuenta frmCancelarCuenta = new FrmCancelarCuenta(datos, usuario);
-        frmCancelarCuenta.setVisible(true);
-        dispose();
+        try {
+            cuentaNegocio.obtenerCuentas(usuario.getCliente().getId());
+            FrmCancelarCuenta frmCancelarCuenta = new FrmCancelarCuenta(datos, usuario);
+            frmCancelarCuenta.setVisible(true);
+            dispose();
+        } catch (NegocioException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Oops!", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnCancelarCuentaActionPerformed
 
+    /**
+     * Acción realizada cuando se presiona el botón "Depositar". Se muestra el
+     * formulario para realizar un depósito en una cuenta bancaria.
+     *
+     * @param evt El evento de acción.
+     */
     private void btnDepositarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDepositarActionPerformed
-        FrmDepositoRetiro frmEditarCuenta = new FrmDepositoRetiro(datos, usuario, DEPOSITO);
-        frmEditarCuenta.setVisible(true);
-        dispose();
+        try {
+            cuentaNegocio.obtenerCuentas(usuario.getCliente().getId());
+            FrmDepositoRetiro frmEditarCuenta = new FrmDepositoRetiro(datos, usuario, DEPOSITO);
+            frmEditarCuenta.setVisible(true);
+            dispose();
+        } catch (NegocioException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Oops!", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnDepositarActionPerformed
 
+    /**
+     * Acción realizada cuando se presiona el botón "Retiro Sin Cuenta". Se
+     * muestra el formulario para autorizar un retiro sin cuenta asociada.
+     *
+     * @param evt El evento de acción.
+     */
     private void btnRetiroSinCuentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetiroSinCuentaActionPerformed
-        FrmAutorizarRetiroSinCuenta frmAutorizar = new FrmAutorizarRetiroSinCuenta(datos, usuario);
-        frmAutorizar.setVisible(true);
-        dispose();
+        try {
+            cuentaNegocio.obtenerCuentas(usuario.getCliente().getId());
+            FrmAutorizarRetiroSinCuenta frmAutorizar = new FrmAutorizarRetiroSinCuenta(datos, usuario);
+            frmAutorizar.setVisible(true);
+            dispose();
+        } catch (NegocioException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Oops!", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnRetiroSinCuentaActionPerformed
 
+    /**
+     * Acción realizada cuando se presiona el botón "Retiro". Se muestra el
+     * formulario para realizar un retiro en una cuenta bancaria.
+     *
+     * @param evt El evento de acción.
+     */
     private void btnRetiroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetiroActionPerformed
-        FrmDepositoRetiro frmEditarCuenta = new FrmDepositoRetiro(datos, usuario, RETIRO);
-        frmEditarCuenta.setVisible(true);
-        dispose();
+        try {
+            cuentaNegocio.obtenerCuentas(usuario.getCliente().getId());
+            FrmDepositoRetiro frmEditarCuenta = new FrmDepositoRetiro(datos, usuario, RETIRO);
+            frmEditarCuenta.setVisible(true);
+            dispose();
+        } catch (NegocioException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Oops!", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnRetiroActionPerformed
 
 //    /**

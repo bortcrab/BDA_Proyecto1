@@ -1,12 +1,12 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ * FrmCancelarCuenta.java
  */
 package presentacion;
 
 import dtos.CuentaDTO;
-import dtos.Datos;
+import negocio.Datos;
 import dtos.Usuario;
+import java.awt.event.KeyEvent;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
@@ -21,8 +21,11 @@ import negocio.ICuentaNegocio;
 import negocio.NegocioException;
 
 /**
+ * Esta clase representa una ventana de interfaz de usuario para cancelar una
+ * cuenta.
  *
- * @author jorge
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class FrmCancelarCuenta extends javax.swing.JFrame {
 
@@ -32,7 +35,10 @@ public class FrmCancelarCuenta extends javax.swing.JFrame {
     ICuentaNegocio cuentaNegocio;
 
     /**
-     * Creates new form FrmCuenta
+     * Crea una nueva instancia de FrmCancelarCuenta.
+     *
+     * @param datos el objeto de datos de la aplicación
+     * @param usuario el usuario actual de la aplicación
      */
     public FrmCancelarCuenta(Datos datos, Usuario usuario) {
         initComponents();
@@ -44,6 +50,9 @@ public class FrmCancelarCuenta extends javax.swing.JFrame {
         obtenerCuentas();
     }
 
+    /**
+     * Método para obtener las cuentas del cliente y mostrarlas en un ComboBox.
+     */
     private void obtenerCuentas() {
         try {
             List<CuentaDTO> listaCuentasDTO = cuentaNegocio.obtenerCuentas(usuario.getCliente().getId());
@@ -60,6 +69,13 @@ public class FrmCancelarCuenta extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Formatea el saldo en formato de moneda.
+     *
+     * @param saldo el saldo a formatear
+     * @return una cadena que representa el saldo formateado en formato de
+     * moneda
+     */
     private String formatearSaldo(float saldo) {
         NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.US);
         return formatter.format(saldo);
@@ -98,6 +114,11 @@ public class FrmCancelarCuenta extends javax.swing.JFrame {
 
         txtSaldo.setEditable(false);
         txtSaldo.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtSaldo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtSaldoKeyTyped(evt);
+            }
+        });
 
         btnConfirmar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnConfirmar.setText("Confirmar");
@@ -194,12 +215,26 @@ public class FrmCancelarCuenta extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Crea una nueva instancia de FrmMenu, la hace visible y cierra la ventana
+     * actual.
+     *
+     * @param evt el evento de acción
+     */
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         FrmMenu frmMenu = new FrmMenu(datos, usuario);
         frmMenu.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
+    /**
+     * Verifica la contraseña ingresada por el usuario y, si es correcta, busca
+     * la cuenta seleccionada, la elimina y muestra un mensaje de éxito. Luego,
+     * crea una nueva instancia de FrmMenu, la hace visible y cierra la ventana
+     * actual.
+     *
+     * @param evt el evento de acción
+     */
     private void btnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmarActionPerformed
         String contrasenia = "";
         try {
@@ -226,34 +261,30 @@ public class FrmCancelarCuenta extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnConfirmarActionPerformed
 
-    private String hashContrasenia(String contraseniaOriginal) throws NoSuchAlgorithmException {
-        try {
-            StringBuilder sb = new StringBuilder();
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-            
-            // Actualizar el digest con los datos proporcionados
-            md.update(contraseniaOriginal.getBytes());
-            
-            // Calcular el hash
-            byte[] hashBytes = md.digest();
-            
-            // Convertir el hash a una representación hexadecimal
-            for (byte b : hashBytes) {
-                sb.append(String.format("%02x", b));
-            }
-            
-            return sb.toString();
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(FrmAbrirCuenta.class.getName()).log(Level.SEVERE, null, ex);
-            throw new NoSuchAlgorithmException(ex.getMessage());
-        }
-    }
-    
+    /**
+     * Actualiza el campo de texto "Saldo" con el saldo de la cuenta
+     * seleccionada.
+     *
+     * @param evt el evento de acción
+     */
     private void comboCuentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboCuentasActionPerformed
         CuentaDTO cuentaDTO = (CuentaDTO) comboCuentas.getSelectedItem();
         String saldoFormateado = formatearSaldo(Float.parseFloat(cuentaDTO.getSaldo()));
         txtSaldo.setText(saldoFormateado);
     }//GEN-LAST:event_comboCuentasActionPerformed
+
+    /**
+     * Método que limita la entrada de texto a números en el campo de texto
+     * "Saldo".
+     *
+     * @param evt el evento de teclado
+     */
+    private void txtSaldoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSaldoKeyTyped
+        char c = evt.getKeyChar();
+        if (((c < '0') || (c > '9')) && (c != KeyEvent.VK_BACK_SPACE)) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtSaldoKeyTyped
 
 //    /**
 //     * @param args the command line arguments

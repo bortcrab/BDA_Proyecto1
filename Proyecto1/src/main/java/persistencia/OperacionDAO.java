@@ -22,7 +22,8 @@ import javax.crypto.spec.SecretKeySpec;
  * clase que implementa las funciones de lectura y escritura a la información de
  * una operación en la base de datos
  *
- * @author Usuario
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class OperacionDAO implements IOperacionDAO {
 
@@ -330,14 +331,12 @@ public class OperacionDAO implements IOperacionDAO {
             //logger.log(Level.SEVERE, "Ocurrió un error al actualizar el cliente.", sqle);
             throw new PersistenciaException("Ocurrió un error al registrar el cliente, inténtelo de nuevo, y si el error persiste comuníquese con el encargado del sistema.");
         }
-        String insertOperacion = "UPDATE RetirosSinCuenta SET estado = ?, fechaHoraCobro = now();";
     }
 
     private void actualizarRetiroSC(int folio, Connection conexion) throws SQLException {
-        String updateCliente = "UPDATE RetirosSinCuenta set estado = ?, fechaHoraCobro = now() WHERE folio = ?;";
+        String updateCliente = "UPDATE RetirosSinCuenta set estado = 'Cobrado', fechaHoraCobro = now() WHERE folio = ? AND estado = 'Pendiente';";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(updateCliente)) {
-            preparedStatement.setString(1, "Cobrado");
-            preparedStatement.setInt(2, folio);
+            preparedStatement.setInt(1, folio);
             // Ejecutar la actualización
             preparedStatement.executeUpdate();
         }

@@ -18,8 +18,9 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * Clase que implementa los metodos para leer y escribir la información de los
  * clientes en la base de datos
- *
- * @author jorge
+ * 
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class ClienteDAO implements IClienteDAO {
 
@@ -55,11 +56,13 @@ public class ClienteDAO implements IClienteDAO {
             ResultSet resultado = comandoSQL.executeQuery(codigoSQL);
             if (resultado.next()) {
                 clienteEntidad = convertirResultado(resultado);
-            } else {
-                throw new SQLException();
             }
-            logger.log(Level.INFO, "Se obtuvieron los datos del cliente: " + clienteEntidad.getIdCliente());
-            return clienteEntidad;
+            if (clienteEntidad.getIdCliente() != 0) {
+                logger.log(Level.INFO, "Se obtuvieron los datos del cliente: " + clienteEntidad.getIdCliente());
+                return clienteEntidad;
+            } else {
+                return null;
+            }
         } catch (SQLException sqle) {
             // Hacer uso de Logger
             logger.log(Level.SEVERE, "Ocurrió un error al obtener los datos del cliente.");
@@ -138,7 +141,7 @@ public class ClienteDAO implements IClienteDAO {
      * @throws SQLException Si ocurre un error al hacer la operación
      */
     private void insertarCliente(ClienteEntidad clienteEntidad, Connection conexion) throws SQLException {
-        String insertCliente = "INSERT INTO Clientes (nombres, apellidoPaterno, apellidoMaterno, fechaNacimiento, correo, contrasenia) VALUES (?, ?, ?, ?, ?, AES_ENCRYPT(?, A'pipucatepipucate'));";
+        String insertCliente = "INSERT INTO Clientes (nombres, apellidoPaterno, apellidoMaterno, fechaNacimiento, correo, contrasenia) VALUES (?, ?, ?, ?, ?, AES_ENCRYPT(?, 'pipucatepipucate'));";
         try (PreparedStatement preparedStatement = conexion.prepareStatement(insertCliente, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, clienteEntidad.getNombres());
             preparedStatement.setString(2, clienteEntidad.getApellidoPaterno());

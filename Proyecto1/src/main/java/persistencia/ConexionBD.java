@@ -1,4 +1,3 @@
-
 /*
  * ConexionBD.java
  */
@@ -13,7 +12,8 @@ import java.util.logging.Logger;
 /**
  * Clase que se utiliza para crear la conexión con la base de datos de MySQL
  *
- * @author Usuario
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class ConexionBD implements IConexionBD {
 
@@ -21,7 +21,7 @@ public class ConexionBD implements IConexionBD {
     private final String BASE_DATOS = "proyecto1";
     private final String URL = "jdbc:mysql://" + SERVER + "/" + BASE_DATOS;
     private final String USUARIO = "root";
-    private final String CONTRASENIA = "juvito";
+    private final String CONTRASENIA = "root";
     private Logger logger = Logger.getLogger(ConexionBD.class.getName());
 
     /**
@@ -37,8 +37,8 @@ public class ConexionBD implements IConexionBD {
             logger.log(Level.INFO, "La conexión con la base de datos fue exitosa.");
             return conexion;
         } catch (SQLException sqle) {
-            logger.log(Level.SEVERE, "Error al conectar con la base de datos.", sqle);
-            throw new PersistenciaException("Ocurrió un error al conectar con la base de datos. Revise que las credenciales sean las correctas.");
+            logger.log(Level.SEVERE, "Error al conectar con la base de datos. Revise que las credenciales sean las correctas.", sqle);
+            throw new PersistenciaException("Hubo un error al conectar con la base de datos.");
         }
     }
 }

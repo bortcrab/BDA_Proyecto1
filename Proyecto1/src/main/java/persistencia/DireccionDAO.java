@@ -16,7 +16,8 @@ import java.util.logging.Logger;
  * Clase que implementa las funciones de lectura y escritura de la información
  * de una dirección en la base de datos
  *
- * @author jorge
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class DireccionDAO implements IDireccionDAO {
 

@@ -1,11 +1,13 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Utilidades.java
  */
 package utilerias;
 
 /**
+ * Esta clase sirve para agregar utilidades.
  *
- * @author Usuario
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class Utilidades {
     public int RegresarOFFSETMySQL(int limite, int pagina) {

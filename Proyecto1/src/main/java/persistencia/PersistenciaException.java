@@ -7,7 +7,8 @@ package persistencia;
  * Excepción lanzada por los métodos implementados en la capa de persistencia
  * cuando ocurre un error en el uso de la base de datos
  *
- * @author Usuario
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class PersistenciaException extends Exception {
 

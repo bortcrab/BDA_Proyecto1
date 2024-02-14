@@ -1,10 +1,9 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ * FrmHistorial.java
  */
 package presentacion;
 
-import dtos.Datos;
+import negocio.Datos;
 import dtos.OperacionDTO;
 import dtos.Usuario;
 import java.awt.Component;
@@ -13,7 +12,6 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import negocio.ICuentaNegocio;
@@ -21,8 +19,11 @@ import negocio.IOperacionNegocio;
 import negocio.NegocioException;
 
 /**
+ * Esta clase representa una ventana de interfaz de usuario para mostrar el
+ * historial de operaciones de un cliente.
  *
- * @author Usuario
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class FrmHistorial extends javax.swing.JFrame {
 
@@ -37,7 +38,13 @@ public class FrmHistorial extends javax.swing.JFrame {
     private int anchoOriginal7;
 
     /**
-     * Creates new form FrmHistorial
+     * Inicializa los componentes de la ventana y asigna los datos de cliente y
+     * operaciones proporcionados. Carga las operaciones del cliente en la tabla
+     * de operaciones con el tipo especificado ("Todos" por defecto) y las
+     * fechas de inicio y fin nulas.
+     *
+     * @param datos los datos de la aplicación
+     * @param usuario el usuario actual
      */
     public FrmHistorial(Datos datos, Usuario usuario) {
         initComponents();
@@ -51,6 +58,14 @@ public class FrmHistorial extends javax.swing.JFrame {
         anchoOriginal7 = tblOperaciones.getColumnModel().getColumn(7).getWidth();
     }
 
+    /**
+     * Carga las operaciones del cliente en la tabla de operaciones.
+     *
+     * @param idCliente el ID del cliente
+     * @param tipo el tipo de operaciones a mostrar
+     * @param inicio la fecha de inicio de la búsqueda
+     * @param fin la fecha de fin de la búsqueda
+     */
     private void cargarOperacionesEnTabla(int idCliente, String tipo, Date inicio, Date fin) {
         try {
             List<OperacionDTO> operacionesLista = operacionNegocio.buscarOperacionesTabla(idCliente, tipo, inicio, fin, pagina, LIMITE);
@@ -58,10 +73,15 @@ public class FrmHistorial extends javax.swing.JFrame {
             lblPagina.setText("Página " + pagina);
         } catch (NegocioException ex) {
             pagina--;
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Información", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    /**
+     * Llena la tabla de operaciones con los datos proporcionados.
+     *
+     * @param operacionesLista la lista de operaciones
+     * @param tipo el tipo de operaciones a mostrar
+     */
     private void llenarTablaClientes(List<OperacionDTO> operacionesLista, String tipo) {
         DefaultTableModel modeloTabla = (DefaultTableModel) tblOperaciones.getModel();
 
@@ -70,87 +90,6 @@ public class FrmHistorial extends javax.swing.JFrame {
                 modeloTabla.removeRow(i);
             }
         }
-        
-        switch (tipo) {
-            case "Todos":
-                tblOperaciones.getColumnModel().getColumn(4).setHeaderValue("Cuenta origen");
-                tblOperaciones.getColumnModel().getColumn(5).setHeaderValue("Cuenta destino");
-//                tblOperaciones.getColumnModel().getColumn(5).setMinWidth(anchoOriginal5);
-//                tblOperaciones.getColumnModel().getColumn(5).setMaxWidth(anchoOriginal5);
-//                tblOperaciones.getColumnModel().getColumn(5).setWidth(anchoOriginal5);
-//                
-//                tblOperaciones.getColumnModel().getColumn(6).setMinWidth(anchoOriginal6);
-//                tblOperaciones.getColumnModel().getColumn(6).setMaxWidth(anchoOriginal6);
-//                tblOperaciones.getColumnModel().getColumn(6).setWidth(anchoOriginal6);
-//
-//                tblOperaciones.getColumnModel().getColumn(7).setMinWidth(anchoOriginal7);
-//                tblOperaciones.getColumnModel().getColumn(7).setMaxWidth(anchoOriginal7);
-//                tblOperaciones.getColumnModel().getColumn(7).setWidth(anchoOriginal7);
-                break;
-            case "Transferencia":
-                tblOperaciones.getColumnModel().getColumn(4).setHeaderValue("Cuenta origen");
-                tblOperaciones.getColumnModel().getColumn(5).setHeaderValue("Cuenta destino");
-//                tblOperaciones.getColumnModel().getColumn(5).setMinWidth(1);
-//                tblOperaciones.getColumnModel().getColumn(5).setMaxWidth(1);
-//                tblOperaciones.getColumnModel().getColumn(5).setWidth(1);
-//                
-//                tblOperaciones.getColumnModel().getColumn(6).setMinWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(6).setMaxWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(6).setWidth(0);
-//
-//                tblOperaciones.getColumnModel().getColumn(7).setMinWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(7).setMaxWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(7).setWidth(0);
-                break;
-            case "Retiro":
-                tblOperaciones.getColumnModel().getColumn(4).setHeaderValue("No. de cuenta");
-//                tblOperaciones.getColumnModel().getColumn(4).setHeaderValue("No. de cuenta");
-//                tblOperaciones.getColumnModel().getColumn(5).setMinWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(5).setMaxWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(5).setWidth(0);
-//                
-//                tblOperaciones.getColumnModel().getColumn(6).setMinWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(6).setMaxWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(6).setWidth(0);
-//
-//                tblOperaciones.getColumnModel().getColumn(7).setMinWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(7).setMaxWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(7).setWidth(0);
-                break;
-            case "Retiro sin cuenta":
-                tblOperaciones.getColumnModel().getColumn(4).setHeaderValue("No. de cuenta");
-//                tblOperaciones.getColumnModel().getColumn(4).setHeaderValue("No. de cuenta");
-//                tblOperaciones.getColumnModel().getColumn(5).setMinWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(5).setMaxWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(5).setWidth(0);
-//                
-//                tblOperaciones.getColumnModel().getColumn(6).setMinWidth(1);
-//                tblOperaciones.getColumnModel().getColumn(6).setMaxWidth(1);
-//                tblOperaciones.getColumnModel().getColumn(6).setWidth(1);
-//
-//                tblOperaciones.getColumnModel().getColumn(7).setMinWidth(1);
-//                tblOperaciones.getColumnModel().getColumn(7).setMaxWidth(1);
-//                tblOperaciones.getColumnModel().getColumn(7).setWidth(1);
-                break;
-            case "Depósito":
-                tblOperaciones.getColumnModel().getColumn(4).setHeaderValue("No. de cuenta");
-//                tblOperaciones.getColumnModel().getColumn(4).setHeaderValue("No. de cuenta");
-//                tblOperaciones.getColumnModel().getColumn(5).setMinWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(5).setMaxWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(5).setWidth(0);
-//                
-//                tblOperaciones.getColumnModel().getColumn(6).setMinWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(6).setMaxWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(6).setWidth(0);
-//
-//                tblOperaciones.getColumnModel().getColumn(7).setMinWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(7).setMaxWidth(0);
-//                tblOperaciones.getColumnModel().getColumn(7).setWidth(0);
-                break;
-            default:
-                throw new AssertionError();
-        }
-        
 
         if (operacionesLista != null) {
             operacionesLista.forEach(row -> {
@@ -168,7 +107,13 @@ public class FrmHistorial extends javax.swing.JFrame {
             });
         }
     }
-    
+
+    /**
+     * Formatea un monto en formato de moneda.
+     *
+     * @param monto el monto a formatear
+     * @return el monto formateado como una cadena de texto en formato de moneda
+     */
     private String formatearMonto(float monto) {
         NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.US);
         return formatter.format(monto);
@@ -395,14 +340,24 @@ public class FrmHistorial extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Método que regresa al menú principal.
+     * 
+     * @param evt el evento de acción
+     */
     private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
         FrmMenu frmMenu = new FrmMenu(datos, usuario);
         frmMenu.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnVolverActionPerformed
-
+    
+    /**
+     * Método que manda los parámetros para realizar una búsqueda de operaciones.
+     * 
+     * @param evt el evento de acción
+     */
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        JButton boton = (JButton)evt.getSource();
+        JButton boton = (JButton) evt.getSource();
         if (boton.getText().equals("Buscar")) {
             pagina = 1;
         }
@@ -414,16 +369,21 @@ public class FrmHistorial extends javax.swing.JFrame {
         } else {
             inicio = null;
         }
-        
+
         if (dtchFin.getDate() != null) {
             fin = new java.sql.Date(dtchFin.getDate().getTime());
         } else {
             fin = null;
         }
-        
+
         cargarOperacionesEnTabla(idCliente, tipo, inicio, fin);
     }//GEN-LAST:event_btnBuscarActionPerformed
 
+    /**
+     * Método que limpia los filtros de búsqueda.
+     * 
+     * @param evt el evento de acción
+     */
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
         comboTipos.setSelectedIndex(0);
         dtchInicio.setDate(null);
@@ -433,7 +393,7 @@ public class FrmHistorial extends javax.swing.JFrame {
                 break;
             }
         }
-        
+
         dtchFin.setDate(null);
         for (Component component : dtchInicio.getComponents()) {
             if (component instanceof JTextField) {
@@ -443,6 +403,11 @@ public class FrmHistorial extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnLimpiarActionPerformed
 
+    /**
+     * Método que regresa a la página anterior.
+     * 
+     * @param evt el evento de acción
+     */
     private void btnAnteriorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnteriorActionPerformed
         if (pagina > 1) {
             pagina--;
@@ -450,6 +415,11 @@ public class FrmHistorial extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnAnteriorActionPerformed
 
+    /**
+     * Método que avanza a la siguiente página.
+     * 
+     * @param evt el evento de acción
+     */
     private void btnSiguienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSiguienteActionPerformed
         pagina++;
         btnBuscarActionPerformed(evt);

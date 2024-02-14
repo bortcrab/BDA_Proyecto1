@@ -21,7 +21,8 @@ import java.util.logging.Logger;
  * Clase que implementa las funciones para leer y escribir información de una
  * cuenta en la base de datos
  *
- * @author bortc
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class CuentaDAO implements ICuentaDAO {
 

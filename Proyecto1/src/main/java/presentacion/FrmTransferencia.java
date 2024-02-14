@@ -5,11 +5,10 @@
 package presentacion;
 
 import dtos.CuentaDTO;
-import dtos.Datos;
+import negocio.Datos;
 import dtos.OperacionDTO;
 import dtos.Usuario;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.awt.event.KeyEvent;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
@@ -23,8 +22,11 @@ import negocio.IOperacionNegocio;
 import negocio.NegocioException;
 
 /**
+ * Esta clase representa una ventana de interfaz de usuario para realizar
+ * transferencias.
  *
- * @author jorge
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class FrmTransferencia extends javax.swing.JFrame {
 
@@ -35,7 +37,12 @@ public class FrmTransferencia extends javax.swing.JFrame {
     IOperacionNegocio operacionNegocio;
 
     /**
-     * Creates new form FrmDeposito
+     * Constructor de la clase FrmTransferencia. Inicializa el formulario y
+     * carga las cuentas del usuario para realizar la transferencia.
+     *
+     * @param datos Objeto de datos que contiene las instancias de los objetos
+     * de negocio necesarios.
+     * @param usuario Objeto Usuario que representa al usuario actual.
      */
     public FrmTransferencia(Datos datos, Usuario usuario) {
         initComponents();
@@ -48,6 +55,10 @@ public class FrmTransferencia extends javax.swing.JFrame {
         obtenerCuentas();
     }
 
+    /**
+     * Método privado que obtiene las cuentas del usuario y las carga en el
+     * combo box.
+     */
     private void obtenerCuentas() {
         try {
             List<CuentaDTO> listaCuentasDTO = cuentaNegocio.obtenerCuentas(usuario.getCliente().getId());
@@ -64,11 +75,18 @@ public class FrmTransferencia extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Método privado que formatea el saldo en formato de moneda.
+     *
+     * @param saldo El saldo a formatear.
+     * @return El saldo formateado en formato de moneda.
+     */
     private String formatearSaldo(float saldo) {
         NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.US);
         String saldoFormateado = formatter.format(saldo);
         return saldoFormateado;
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -134,6 +152,11 @@ public class FrmTransferencia extends javax.swing.JFrame {
         });
 
         txtMonto.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtMonto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtMontoKeyTyped(evt);
+            }
+        });
 
         pwdContrasenia.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
@@ -142,6 +165,11 @@ public class FrmTransferencia extends javax.swing.JFrame {
 
         txtDestino.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         txtDestino.setToolTipText("");
+        txtDestino.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtDestinoKeyTyped(evt);
+            }
+        });
 
         txtSaldo.setEditable(false);
         txtSaldo.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
@@ -228,6 +256,13 @@ public class FrmTransferencia extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Acción realizada cuando se presiona el botón "Confirmar" para realizar la
+     * transferencia. Verifica la contraseña ingresada y realiza la
+     * transferencia si es correcta.
+     *
+     * @param evt El evento de acción.
+     */
     private void btnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmarActionPerformed
         String contrasenia = "";
         try {
@@ -240,13 +275,13 @@ public class FrmTransferencia extends javax.swing.JFrame {
             try {
                 CuentaDTO cuentaDTO = (CuentaDTO) comboCuentas.getSelectedItem();
                 cuentaNegocio.transferir(cuentaDTO.getNumCuenta(), Integer.parseInt(txtDestino.getText()), Float.parseFloat(txtMonto.getText()));
-                
+
                 OperacionDTO operacionDTO = new OperacionDTO();
                 operacionDTO.setMonto(txtMonto.getText());
                 operacionDTO.setTipo("Transferencia");
                 operacionDTO.setNumCuentaOrigen(cuentaDTO.getNumCuenta());
                 operacionDTO.setNumCuentaDestino(Integer.parseInt(txtDestino.getText()));
-                
+
                 operacionNegocio.guardar(operacionDTO);
                 JOptionPane.showMessageDialog(this, "Transferencia exitosa.", "¡Éxito!", JOptionPane.INFORMATION_MESSAGE);
                 FrmMenu frmMenu = new FrmMenu(datos, usuario);
@@ -261,40 +296,54 @@ public class FrmTransferencia extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnConfirmarActionPerformed
 
-    private String hashContrasenia(String contraseniaOriginal) throws NoSuchAlgorithmException {
-        try {
-            StringBuilder sb = new StringBuilder();
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-
-            // Actualizar el digest con los datos proporcionados
-            md.update(contraseniaOriginal.getBytes());
-
-            // Calcular el hash
-            byte[] hashBytes = md.digest();
-
-            // Convertir el hash a una representación hexadecimal
-            for (byte b : hashBytes) {
-                sb.append(String.format("%02x", b));
-            }
-
-            return sb.toString();
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(FrmAbrirCuenta.class.getName()).log(Level.SEVERE, null, ex);
-            throw new NoSuchAlgorithmException(ex.getMessage());
-        }
-    }
-    
+    /**
+     * Acción realizada cuando se presiona el botón "Cancelar". Se muestra el
+     * menú principal.
+     *
+     * @param evt El evento de acción.
+     */
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         FrmMenu frmMenu = new FrmMenu(datos, usuario);
         frmMenu.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
+    /**
+     * Acción realizada cuando se selecciona una cuenta del combo box. Actualiza
+     * el saldo en el campo de texto correspondiente.
+     *
+     * @param evt El evento de acción.
+     */
     private void comboCuentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboCuentasActionPerformed
         CuentaDTO cuentaDTO = (CuentaDTO) comboCuentas.getSelectedItem();
         String saldoFormateado = formatearSaldo(Float.parseFloat(cuentaDTO.getSaldo()));
         txtSaldo.setText(saldoFormateado);
     }//GEN-LAST:event_comboCuentasActionPerformed
+
+    /**
+     * Método que permite ingresar solo números en el campo de texto del
+     * destinatario.
+     *
+     * @param evt El evento de teclado.
+     */
+    private void txtDestinoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDestinoKeyTyped
+        char c = evt.getKeyChar();
+        if (((c < '0') || (c > '9')) && (c != KeyEvent.VK_BACK_SPACE)) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtDestinoKeyTyped
+    
+    /**
+     * Método que permite ingresar solo números en el campo de texto del monto.
+     *
+     * @param evt El evento de teclado.
+     */
+    private void txtMontoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMontoKeyTyped
+        char c = evt.getKeyChar();
+        if (((c < '0') || (c > '9')) && (c != KeyEvent.VK_BACK_SPACE)) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtMontoKeyTyped
 
 //    /**
 //     * @param args the command line arguments

@@ -11,7 +11,8 @@ import java.util.List;
  * Interfaz que define los metodos para la clase que implementa las funciones de
  * acceso a la información de una operación en la base de datos
  *
- * @author Usuario
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public interface IOperacionDAO {
 

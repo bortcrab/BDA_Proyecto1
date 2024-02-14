@@ -1,15 +1,15 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ * FrmDepositoRetiro.java
  */
 package presentacion;
 
 import dtos.CuentaDTO;
-import dtos.Datos;
+import negocio.Datos;
 import dtos.OperacionDTO;
 import dtos.Usuario;
 import enumeradores.AccionCatalogoEnumerador;
 import static enumeradores.AccionCatalogoEnumerador.*;
+import java.awt.event.KeyEvent;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
@@ -25,8 +25,11 @@ import negocio.IOperacionNegocio;
 import negocio.NegocioException;
 
 /**
+ * Esta clase representa una ventana de interfaz de usuario para realizar
+ * depósitos o retiros.
  *
- * @author jorge
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class FrmDepositoRetiro extends javax.swing.JFrame {
 
@@ -38,7 +41,11 @@ public class FrmDepositoRetiro extends javax.swing.JFrame {
     AccionCatalogoEnumerador accion;
 
     /**
-     * Creates new form FrmDeposito
+     * Método constructor
+     * 
+     * @param datos el objeto de datos de la aplicación
+     * @param usuario el usuario actual de la aplicación
+     * @param accion la acción a realizar (depósito o retiro)
      */
     public FrmDepositoRetiro(Datos datos, Usuario usuario, AccionCatalogoEnumerador accion) {
         initComponents();
@@ -62,6 +69,9 @@ public class FrmDepositoRetiro extends javax.swing.JFrame {
         obtenerCuentas();
     }
 
+    /**
+     * Método para obtener las cuentas del cliente y mostrarlas en un ComboBox.
+     */
     private void obtenerCuentas() {
         try {
             List<CuentaDTO> listaCuentasDTO = cuentaNegocio.obtenerCuentas(usuario.getCliente().getId());
@@ -78,6 +88,13 @@ public class FrmDepositoRetiro extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Formatea el saldo en formato de moneda.
+     *
+     * @param saldo el saldo a formatear
+     * @return una cadena que representa el saldo formateado en formato de
+     * moneda
+     */
     private String formatearSaldo(float saldo) {
         NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.US);
         String saldoFormateado = formatter.format(saldo);
@@ -148,6 +165,11 @@ public class FrmDepositoRetiro extends javax.swing.JFrame {
         });
 
         txtMonto.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtMonto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtMontoKeyTyped(evt);
+            }
+        });
 
         pwdContrasenia.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
@@ -225,6 +247,15 @@ public class FrmDepositoRetiro extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Verifica la contraseña ingresada por el usuario y, si es correcta,
+     * realiza la acción correspondiente (depósito o retiro) en la cuenta
+     * seleccionada. Luego, guarda la operación correspondiente y muestra un
+     * mensaje de éxito con los detalles de la transacción. Por último, crea una
+     * nueva instancia de FrmMenu, la hace visible y cierra la ventana actual.
+     *
+     * @param evt el evento de acción
+     */
     private void btnAccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAccionActionPerformed
         String contrasenia = "";
         try {
@@ -264,29 +295,12 @@ public class FrmDepositoRetiro extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnAccionActionPerformed
 
-    private String hashContrasenia(String contraseniaOriginal) throws NoSuchAlgorithmException {
-        try {
-            StringBuilder sb = new StringBuilder();
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-
-            // Actualizar el digest con los datos proporcionados
-            md.update(contraseniaOriginal.getBytes());
-
-            // Calcular el hash
-            byte[] hashBytes = md.digest();
-
-            // Convertir el hash a una representación hexadecimal
-            for (byte b : hashBytes) {
-                sb.append(String.format("%02x", b));
-            }
-
-            return sb.toString();
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(FrmAbrirCuenta.class.getName()).log(Level.SEVERE, null, ex);
-            throw new NoSuchAlgorithmException(ex.getMessage());
-        }
-    }
-
+    /**
+     * Crea una nueva instancia de FrmMenu, la hace visible y cierra la ventana
+     * actual.
+     *
+     * @param evt el evento de acción
+     */
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         FrmMenu frmMenu = new FrmMenu(datos, usuario);
         frmMenu.setVisible(true);
@@ -298,6 +312,19 @@ public class FrmDepositoRetiro extends javax.swing.JFrame {
         String saldoFormateado = formatearSaldo(Float.parseFloat(cuentaDTO.getSaldo()));
         txtSaldo.setText(saldoFormateado);
     }//GEN-LAST:event_comboCuentasActionPerformed
+
+    /**
+     * Actualiza el campo de texto "Saldo" con el saldo de la cuenta
+     * seleccionada.
+     *
+     * @param evt el evento de acción
+     */
+    private void txtMontoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMontoKeyTyped
+        char c = evt.getKeyChar();
+        if (((c < '0') || (c > '9')) && (c != KeyEvent.VK_BACK_SPACE)) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtMontoKeyTyped
 
 //    /**
 //     * @param args the command line arguments

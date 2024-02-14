@@ -1,34 +1,32 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ * FrmAutorizarRetiroSinCuenta.java
  */
 package presentacion;
 
 import dtos.CuentaDTO;
-import dtos.Datos;
+import negocio.Datos;
 import dtos.OperacionDTO;
 import dtos.Usuario;
+import java.awt.event.KeyEvent;
 import java.text.NumberFormat;
-import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.crypto.Cipher;
-import static javax.crypto.Cipher.SECRET_KEY;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.swing.DefaultComboBoxModel;
 import negocio.ICuentaNegocio;
 import negocio.IOperacionNegocio;
 import negocio.NegocioException;
 
 /**
+ * Esta clase representa una ventana de interfaz de usuario para autorizar un
+ * retiro sin cuenta.
  *
- * @author jorge
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
-
 public class FrmAutorizarRetiroSinCuenta extends javax.swing.JFrame {
+
     private Datos datos;
     private Usuario usuario;
     private ICuentaNegocio cuentaNegocio;
@@ -36,9 +34,11 @@ public class FrmAutorizarRetiroSinCuenta extends javax.swing.JFrame {
     private static final String ALGORITHM = "AES";
     private static final String SECRET_KEY = "pipucatepipucate"; // Tu clave secreta
 
-    
     /**
-     * Creates new form FrmAutorizarRetiroSinCuenta
+     * Crea una nueva instancia de FrmAutorizarRetiroSinCuenta.
+     *
+     * @param datos el objeto de datos de la aplicación
+     * @param usuario el usuario actual de la aplicación
      */
     public FrmAutorizarRetiroSinCuenta(Datos datos, Usuario usuario) {
         initComponents();
@@ -46,9 +46,12 @@ public class FrmAutorizarRetiroSinCuenta extends javax.swing.JFrame {
         this.usuario = usuario;
         this.operacionNegocio = datos.getOperacionNegocio();
         this.cuentaNegocio = datos.getCuentaNegocio();
-    obtenerCuentas();
+        obtenerCuentas();
     }
 
+    /**
+     * Método para obtener las cuentas del cliente y mostrarlas en un ComboBox.
+     */
     private void obtenerCuentas() {
         try {
             List<CuentaDTO> listaCuentasDTO = cuentaNegocio.obtenerCuentas(usuario.getCliente().getId());
@@ -65,11 +68,19 @@ public class FrmAutorizarRetiroSinCuenta extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Formatea el saldo en formato de moneda.
+     *
+     * @param saldo el saldo a formatear
+     * @return una cadena que representa el saldo formateado en formato de
+     * moneda
+     */
     private String formatearSaldo(float saldo) {
         NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.US);
         String saldoFormateado = formatter.format(saldo);
         return saldoFormateado;
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -136,9 +147,14 @@ public class FrmAutorizarRetiroSinCuenta extends javax.swing.JFrame {
         lblMensaje.setText("¡Recuerda que tienes 10 minutos para retirar el dinero!");
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel7.setText("Monto:");
+        jLabel7.setText("Monto ($):");
 
         txtMonto.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtMonto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtMontoKeyTyped(evt);
+            }
+        });
 
         comboCuentas.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         comboCuentas.addActionListener(new java.awt.event.ActionListener() {
@@ -237,6 +253,15 @@ public class FrmAutorizarRetiroSinCuenta extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Crea una nueva operación de retiro sin cuenta, guarda la operación en la
+     * base de datos, obtiene la contraseña generada para la operación y
+     * actualiza la interfaz de usuario para mostrar el folio y la contraseña
+     * generada. Además, deshabilita el botón "Revelar" y cambia el texto del
+     * botón "Cancelar" a "Volver".
+     *
+     * @param evt el evento de acción
+     */
     private void btnRevelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRevelarActionPerformed
         try {
             CuentaDTO cuentaDTO = (CuentaDTO) comboCuentas.getSelectedItem();
@@ -260,29 +285,42 @@ public class FrmAutorizarRetiroSinCuenta extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnRevelarActionPerformed
 
-//    public static String decrypt(String ciphertext) throws Exception {
-//        try {
-//            SecretKey originalKey = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
-//            Cipher cipher = Cipher.getInstance(ALGORITHM);
-//            cipher.init(Cipher.DECRYPT_MODE, originalKey);
-//            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(ciphertext));
-//            return new String(decryptedBytes);
-//        } catch (Exception e) {
-//            throw new Exception("Error al desencriptar el texto: " + e.getMessage());
-//        }
-//    }
-    
+    /**
+     * Crea una nueva instancia de FrmMenu, la hace visible y cierra la ventana
+     * actual.
+     *
+     * @param evt el evento de acción
+     */
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         FrmMenu frmMenu = new FrmMenu(datos, usuario);
         frmMenu.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
+    /**
+     * Actualiza el campo de texto "Saldo" con el saldo de la cuenta
+     * seleccionada.
+     *
+     * @param evt el evento de acción
+     */
     private void comboCuentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboCuentasActionPerformed
         CuentaDTO cuentaDTO = (CuentaDTO) comboCuentas.getSelectedItem();
         String saldoFormateado = formatearSaldo(Float.parseFloat(cuentaDTO.getSaldo()));
         txtSaldo.setText(saldoFormateado);
     }//GEN-LAST:event_comboCuentasActionPerformed
+
+    /**
+     * Método que limita la entrada de texto a números en el campo de texto
+     * "Monto".
+     *
+     * @param evt el evento de teclado
+     */
+    private void txtMontoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMontoKeyTyped
+        char c = evt.getKeyChar();
+        if (((c < '0') || (c > '9')) && (c != KeyEvent.VK_BACK_SPACE)) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtMontoKeyTyped
 
 //    /**
 //     * @param args the command line arguments

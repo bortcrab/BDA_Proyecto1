@@ -8,7 +8,8 @@ package negocio;
  * cuando ocurre un error en las operaciones de la información en objetos de 
  * negocio
  * 
- * @author Usuario
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public class NegocioException extends Exception {
 

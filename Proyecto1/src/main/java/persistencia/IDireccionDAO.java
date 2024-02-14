@@ -9,7 +9,8 @@ import entidades.DireccionEntidad;
  * Interfaz que define los metodos para la clase que implementa las funciones de
  * acceso a la información de una dirección en la base de datos
  *
- * @author jorge
+ * @author Juventino López García
+ * @author Diego Valenzuela Parra
  */
 public interface IDireccionDAO {
 
